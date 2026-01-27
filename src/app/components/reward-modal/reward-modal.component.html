@@ -1,0 +1,40 @@
+<ion-content class="reward-content">
+  <div class="container">
+
+    <h2 class="title" [style.opacity]="animationComplete ? '1' : '0.5'">
+      {{ animationComplete ? 'Loot Secured!' : 'Scanning...' }}
+    </h2>
+
+
+
+    <div class="grid-container">
+      <div
+        *ngFor="let slot of gridSlots"
+        class="grid-item"
+        [class.revealed]="slot.isRevealed"
+        [class.inactive]="animationComplete && !slot.isRevealed"
+        [ngClass]="slot.item ? 'rarity-' + slot.item.rarity : 'slot-empty'"
+      >
+
+        <div class="card-back"></div>
+
+        <div class="card-front" *ngIf="slot.item">
+          <ion-icon [name]="slot.item.icon" size="large"></ion-icon>
+          <p>{{ slot.item.name }}</p>
+        </div>
+
+        <div class="empty-slot" *ngIf="!slot.item">
+           <ion-icon name="close-circle-outline"></ion-icon>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="actions" *ngIf="animationComplete">
+      <ion-button expand="block" color="warning" (click)="claimAndClose()">
+        Collect All ({{ collectedItems.length }})
+      </ion-button>
+    </div>
+
+  </div>
+</ion-content>

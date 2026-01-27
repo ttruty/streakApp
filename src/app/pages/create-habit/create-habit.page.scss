@@ -1,0 +1,226 @@
+.custom-segment {
+  margin-bottom: 20px;
+  --background: #363636;
+}
+
+.form-container {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.input-item {
+  --background: #363636;
+  --border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  margin-bottom: 10px;
+}
+
+.loot-preview {
+  margin-top: 20px;
+  text-align: center;
+  padding: 20px;
+  border-radius: 16px;
+  border: 2px dashed #ccc;
+  transition: all 0.3s ease;
+
+  ion-icon {
+    font-size: 40px;
+    margin-bottom: 10px;
+  }
+
+  p {
+    margin: 0;
+    font-weight: bold;
+  }
+
+  // Dynamic Colors
+  &.low {
+    background: #f0f0f0;
+    color: #666;
+    border-color: #999;
+  }
+  &.medium {
+    background: #e3f2fd;
+    color: #1976d2;
+    border-color: #1976d2;
+  }
+  &.high {
+    background: #fff8e1;
+    color: #fbc02d;
+    border-color: #fbc02d;
+  }
+}
+
+.info-box {
+  background: #e8f5e9;
+  color: #2e7d32;
+  padding: 15px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 20px;
+
+  ion-icon {
+    font-size: 24px;
+  }
+  p {
+    margin: 0;
+    font-size: 14px;
+  }
+}
+
+.icon-picker-section {
+  background: white;
+  padding: 15px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+
+  .section-label {
+    display: block;
+    margin-bottom: 10px;
+    font-weight: 600;
+    color: #666;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+}
+
+
+.icon-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+}
+
+.icon-option {
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  background: #f5f5f5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  color: #666;
+  transition: all 0.2s ease;
+  cursor: pointer;
+
+  &.selected {
+    background: var(--ion-color-primary);
+    color: white;
+    transform: scale(1.1);
+    box-shadow: 0 4px 10px rgba(var(--ion-color-primary-rgb), 0.4);
+  }
+}
+
+.icon-picker-section {
+  background: white;
+  padding: 15px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  margin-bottom: 20px;
+
+  .section-label {
+    display: block;
+    margin-bottom: 10px;
+    font-weight: 600;
+    color: #888;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+}
+
+// The "Button" you click to open/close
+.icon-trigger {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 10px;
+  background: #f9f9f9;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background 0.2s;
+
+  &:active {
+    background: #f0f0f0;
+  }
+
+  .selected-preview {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: var(--ion-color-primary);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    box-shadow: 0 4px 10px rgba(var(--ion-color-primary-rgb), 0.3);
+  }
+
+  .trigger-text {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+
+    span {
+      font-weight: 600;
+      font-size: 16px;
+      color: var(--ion-color-dark);
+    }
+    p {
+      margin: 2px 0 0 0;
+      font-size: 12px;
+      color: #999;
+    }
+  }
+
+  .arrow-icon {
+    color: #ccc;
+    font-size: 20px;
+  }
+}
+
+// The Container for the grid
+.icon-grid-wrapper {
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px dashed #eee;
+  animation: slideDown 0.2s ease-out;
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.icon-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: center;
+}
+
+.icon-option {
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  background: #f0f0f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  color: #666;
+  cursor: pointer;
+
+  &.selected {
+    background: var(--ion-color-dark); // Use dark for grid selection to contrast with primary preview
+    color: white;
+    transform: scale(1.1);
+  }
+}

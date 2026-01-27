@@ -1,0 +1,54 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-title>Great Job!</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="close(null)">
+        <ion-icon name="close"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding ion-text-center">
+
+  <h3>How did it go?</h3>
+  <p class="subtitle">Rate your experience to earn your loot.</p>
+
+  <div class="faces-container">
+
+    <div
+      class="face-option"
+      [class.selected]="selectedMood === 'sad'"
+      (click)="selectedMood = 'sad'">
+      <ion-icon name="sad-outline" *ngIf="selectedMood !== 'sad'"></ion-icon>
+      <ion-icon name="sad" *ngIf="selectedMood === 'sad'" color="danger"></ion-icon>
+      <span>Hard</span>
+    </div>
+
+    <div
+      class="face-option"
+      [class.selected]="selectedMood === 'neutral'"
+      (click)="selectedMood = 'neutral'">
+      <ion-icon name="happy-outline" style="transform: rotate(90deg);" *ngIf="selectedMood !== 'neutral'"></ion-icon>
+      <ion-icon name="happy" style="transform: rotate(90deg);" *ngIf="selectedMood === 'neutral'" color="warning"></ion-icon>
+      <span>Okay</span>
+    </div>
+
+    <div
+      class="face-option"
+      [class.selected]="selectedMood === 'happy'"
+      (click)="selectedMood = 'happy'">
+      <ion-icon name="happy-outline" *ngIf="selectedMood !== 'happy'"></ion-icon>
+      <ion-icon name="happy" *ngIf="selectedMood === 'happy'" color="success"></ion-icon>
+      <span>Easy</span>
+    </div>
+
+  </div>
+
+  <div class="confirm-btn">
+    <ion-button expand="block" shape="round" (click)="confirm()" [disabled]="!selectedMood">
+      Claim Loot
+    </ion-button>
+  </div>
+
+</ion-content>

@@ -1,0 +1,38 @@
+.subtitle {
+  color: #666;
+  margin-bottom: 30px;
+}
+
+.faces-container {
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: 40px;
+}
+
+.face-option {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  opacity: 0.5;
+  transition: all 0.2s;
+  transform: scale(0.9);
+
+  ion-icon {
+    font-size: 50px;
+  }
+
+  span {
+    font-weight: 600;
+    font-size: 14px;
+  }
+
+  &.selected {
+    opacity: 1;
+    transform: scale(1.1);
+  }
+}
+
+.confirm-btn {
+  margin-top: 20px;
+}

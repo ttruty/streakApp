@@ -1,0 +1,36 @@
+<ion-header [translucent]="true" class="ion-no-border">
+  <ion-toolbar>
+    <ion-title>Inventory</ion-title>
+    <ion-buttons slot="end">
+      <div class="gold-badge">
+        <ion-icon name="cash-outline" color="warning"></ion-icon>
+        <span>{{ gold }}g</span>
+      </div>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="ion-padding">
+
+  <div *ngIf="items.length === 0" class="empty-state">
+    <ion-icon name="cube-outline"></ion-icon>
+    <h3>No Items Yet</h3>
+    <p>Complete habits to earn loot!</p>
+  </div>
+
+  <div class="inventory-grid">
+    <div
+      *ngFor="let item of items"
+      class="item-card"
+      [class]="item.rarity"
+      (click)="openItemOptions(item)">
+
+      <div class="quantity-badge" *ngIf="item.quantity > 1">{{ item.quantity }}</div>
+
+      <ion-icon [name]="item.icon"></ion-icon>
+      <div class="item-name">{{ item.name }}</div>
+
+    </div>
+  </div>
+
+</ion-content>

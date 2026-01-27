@@ -1,0 +1,117 @@
+<ion-header [translucent]="true" class="ion-no-border">
+  <ion-toolbar>
+    <ion-title>New Quest</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="ion-padding">
+
+  <ion-segment [(ngModel)]="habitType" mode="ios" class="custom-segment">
+    <ion-segment-button value="regular">
+      <ion-label>Regular Habit</ion-label>
+    </ion-segment-button>
+    <ion-segment-button value="random">
+      <ion-label>Random Event</ion-label>
+    </ion-segment-button>
+  </ion-segment>
+
+  <div class="form-container">
+<div class="icon-picker-section">
+      <ion-label class="section-label">Icon</ion-label>
+
+      <div class="icon-trigger" (click)="toggleIconPicker()">
+        <div class="selected-preview">
+          <ion-icon [name]="selectedIcon"></ion-icon>
+        </div>
+        <div class="trigger-text">
+          <span>{{ selectedIcon | titlecase }}</span>
+          <p>Tap to change</p>
+        </div>
+        <ion-icon
+          [name]="isIconPickerExpanded ? 'chevron-up-outline' : 'chevron-down-outline'"
+          class="arrow-icon">
+        </ion-icon>
+      </div>
+
+      <div class="icon-grid-wrapper" *ngIf="isIconPickerExpanded">
+        <div class="icon-grid">
+          <div
+            *ngFor="let icon of availableIcons"
+            class="icon-option"
+            [class.selected]="selectedIcon === icon"
+            (click)="selectIcon(icon)">
+            <ion-icon [name]="icon"></ion-icon>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <ion-item class="input-item">
+      <ion-label position="stacked">Habit Name</ion-label>
+      <ion-input [(ngModel)]="habitName" placeholder="e.g. Drink Water"></ion-input>
+    </ion-item>
+
+    <div *ngIf="habitType === 'regular'">
+
+      <ion-item class="input-item">
+        <ion-label position="stacked">Goal Frequency</ion-label>
+        <ion-select [(ngModel)]="frequency" interface="popover">
+          <ion-select-option value="daily">Every Day</ion-select-option>
+          <ion-select-option value="weekly">Once a Week</ion-select-option>
+          <ion-select-option value="weekdays">Weekdays Only</ion-select-option>
+        </ion-select>
+      </ion-item>
+
+      <ion-item class="input-item">
+        <ion-label position="stacked">Loot Reward</ion-label>
+        <ion-select [(ngModel)]="lootLevel" interface="action-sheet">
+          <ion-select-option value="low">Low Loot (Common)</ion-select-option>
+          <ion-select-option value="medium">Medium Loot (Rare)</ion-select-option>
+          <ion-select-option value="high">High Loot (Legendary)</ion-select-option>
+        </ion-select>
+      </ion-item>
+
+      <div class="loot-preview" [ngClass]="lootLevel">
+        <ion-icon name="gift"></ion-icon>
+        <p>{{ lootLevel | titlecase }} Reward</p>
+      </div>
+
+    </div>
+
+    <div *ngIf="habitType === 'random'">
+      <div class="info-box">
+        <ion-icon name="dice-outline"></ion-icon>
+        <p>Random events will pop up unexpectedly based on your settings.</p>
+      </div>
+
+      <ion-item class="input-item">
+        <ion-label position="stacked">Occurrence (1-5)</ion-label>
+        <ion-input
+          type="number"
+          [(ngModel)]="randomCount"
+          min="1"
+          max="5"
+          placeholder="e.g. 3">
+        </ion-input>
+      </ion-item>
+
+      <ion-item class="input-item">
+        <ion-label position="stacked">Timeframe</ion-label>
+        <ion-select [(ngModel)]="randomPeriod" interface="popover">
+          <ion-select-option value="day">Per Day</ion-select-option>
+          <ion-select-option value="week">Per Week</ion-select-option>
+        </ion-select>
+      </ion-item>
+    </div>
+
+  </div>
+
+</ion-content>
+
+<ion-footer class="ion-no-border">
+  <ion-toolbar class="ion-padding">
+    <ion-button expand="block" (click)="saveHabit()" [disabled]="!habitName" shape="round">
+      Create Habit
+    </ion-button>
+  </ion-toolbar>
+</ion-footer>

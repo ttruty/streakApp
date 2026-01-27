@@ -1,20 +1,53 @@
-<ion-header [translucent]="true">
+<ion-header [translucent]="true" class="ion-no-border">
   <ion-toolbar>
-    <ion-title>
-      Blank
-    </ion-title>
+    <ion-title>Daily Tracker</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">Blank</ion-title>
-    </ion-toolbar>
-  </ion-header>
+<ion-content [fullscreen]="true" class="ion-padding">
 
-  <div id="container">
-    <strong>Ready to create an app?</strong>
-    <p>Start with Ionic <a target="_blank" rel="noopener noreferrer" href="https://ionicframework.com/docs/components">UI Components</a></p>
+  <div class="close-container">
+    <ion-button routerLink="/tabs/dashboard" fill="clear" size="large">
+      <ion-icon name="close-circle-outline"></ion-icon>
+    </ion-button>
   </div>
+
+  <div class="container">
+
+    <div class="streak-circle-container">
+      <div class="streak-circle">
+        <ion-icon name="flame" color="warning"></ion-icon>
+        <h1>{{ currentStreak }}</h1>
+        <p>DAY STREAK</p>
+      </div>
+    </div>
+
+    <div class="week-container">
+      <h3>This Week</h3>
+
+      <div class="week-grid">
+        <div *ngFor="let day of weekProgress" class="day-column" [class.today]="day.isToday">
+
+          <span class="day-label">{{ day.name }}</span>
+
+          <div class="status-icon">
+            <ion-icon
+              *ngIf="day.visited"
+              name="checkmark-circle"
+              color="success">
+            </ion-icon>
+
+            <ion-icon
+              *ngIf="!day.visited"
+              name="ellipse-outline"
+              color="medium">
+            </ion-icon>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+  </div>
+
 </ion-content>

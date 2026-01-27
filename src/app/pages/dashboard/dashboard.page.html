@@ -1,0 +1,44 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title>My Character</ion-title>
+    <ion-buttons slot="end">
+      <ion-button>
+        <ion-icon name="settings-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" scrollY="false">
+  <div class="split-layout">
+
+    <div class="character-section">
+      <canvas #rendererCanvas class="three-canvas"
+      (click)="onCharacterTouch()">
+      ></canvas>
+      <div class="level-badge">Lvl 5</div>
+    </div>
+
+    <div class="habits-section">
+      <h3>Today's Tasks</h3>
+      <ion-list lines="none" class="habit-list">
+        <ion-item *ngFor="let habit of habits" class="habit-item">
+          <ion-checkbox slot="start" [(ngModel)]="habit.completed"
+          (ionChange)="onToggleHabit($event, habit)"></ion-checkbox>
+          <div class="habit-icon-circle" slot="start">
+            <ion-icon [name]="habit.icon"></ion-icon>
+          </div>
+
+          <ion-label>
+            <h2>{{ habit.title }}</h2>
+            <p>{{ habit.streak }} day streak</p>
+          </ion-label>
+        </ion-item>
+      </ion-list>
+    </div>
+
+  </div>
+</ion-content>
