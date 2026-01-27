@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IonTabs, IonTabBar, IonTabButton, IonIcon, IonLabel } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { home, addCircle, cube } from 'ionicons/icons';
+import { home, addCircle, cube, personCircleOutline } from 'ionicons/icons';
 
 @Component({
   selector: 'app-tabs',
@@ -13,6 +13,6 @@ import { home, addCircle, cube } from 'ionicons/icons';
 })
 export class TabsPage {
   constructor() {
-    addIcons({ home, addCircle, cube });
+    addIcons({home,addCircle,cube,personCircleOutline});
   }
 }

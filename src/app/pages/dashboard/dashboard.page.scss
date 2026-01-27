@@ -6,8 +6,6 @@
 }
 
 
-
-
 .character-section {
   flex: 1;
   height: 50vh;
@@ -39,7 +37,26 @@
     font-weight: bold;
     z-index: 10;
   }
+
+
+  .xp-badge {
+    position: absolute;
+    top: 0;
+    right: 0;
+    align-items: center;
+    gap: 5px;
+    background: #303030;
+    padding: 5px 12px;
+    border-radius: 20px;
+    border: 1px solid #4b60ff;
+
+    span {
+      font-weight: bold;
+      color: #f57f17;
+    }
+  }
 }
+
 
 .habits-section {
   /* --- SCROLLING MAGIC --- */
@@ -57,10 +74,62 @@
 }
 
 .habit-item {
-  --background: transparent;
-  margin-bottom: 10px;
-  border-radius: 10px;
+  margin-bottom: 0px; /* Reset this, let the sliding wrapper handle spacing */
+  --border-radius: 12px;
+  border-radius: 12px;
+  --color: white; /* White text for all */
+
+  /* 1. Low Loot (Common) - Dark Slate/Grey */
+  &.rarity-low {
+    --background: #37474f;
+    border: 1px solid #546e7a;
+  }
+
+  /* 2. Medium Loot (Rare) - Deep Blue */
+  &.rarity-medium {
+    --background: #1565c0;
+    border: 1px solid #42a5f5;
+  }
+
+  /* 3. High Loot (Legendary) - Deep Gold/Orange */
+  &.rarity-high {
+    --background: #5d144b;
+    border: 1px solid #ff00e6;
+  }
+}
+
+/* Add spacing to the wrapper so the items don't stick together */
+ion-item-sliding {
+  margin-bottom: 12px;
+  background: transparent;
+  border-radius: 12px;
 }
 .habit-list {
   border-radius: 10px;
+}
+
+.streak-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+
+  /* Glass effect: See-through white */
+  background: rgba(255, 255, 255, 0.2);
+
+  padding: 4px 10px;
+  border-radius: 20px; /* Pill shape */
+  margin-top: 6px;
+  width: fit-content;
+
+  ion-icon {
+    font-size: 14px;
+    color: #ffca28; /* Flame Color (Amber) */
+  }
+
+  span {
+    font-size: 12px;
+    font-weight: 600;
+    color: white;
+    letter-spacing: 0.5px;
+  }
 }

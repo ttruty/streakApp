@@ -4,10 +4,11 @@ import { FormsModule } from '@angular/forms';
 import {
   IonContent, IonHeader, IonTitle, IonToolbar, IonButtons,
   IonMenuButton, IonButton, IonIcon, IonList, IonItem,
-  IonLabel, IonCheckbox
+  IonLabel, IonCheckbox,
+  IonItemSliding, IonItemOptions, IonItemOption, AlertController
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { settingsOutline } from 'ionicons/icons';
+import { settingsOutline, flame } from 'ionicons/icons';
 import { ToastController } from '@ionic/angular/standalone';
 
 // Three.js Imports
@@ -28,6 +29,7 @@ import {
   water, wifi, wine
 } from 'ionicons/icons';
 import { CompletionModalComponent } from '../../components/completion-modal/completion-modal.component';
+import { CharacterService } from 'src/app/services/character';
 
 @Component({
   selector: 'app-dashboard',
@@ -39,7 +41,7 @@ import { CompletionModalComponent } from '../../components/completion-modal/comp
     FormsModule,
     IonContent, IonHeader, IonTitle, IonToolbar, IonButtons,
     IonMenuButton, IonButton, IonIcon, IonList, IonItem,
-    IonLabel, IonCheckbox
+    IonLabel, IonCheckbox, IonItemSliding, IonItemOptions, IonItemOption
   ]
 })
 export class DashboardPage implements AfterViewInit, OnDestroy {
@@ -61,7 +63,9 @@ export class DashboardPage implements AfterViewInit, OnDestroy {
 
   constructor(private modalCtrl: ModalController, private habitService: HabitService
     , private toastCtrl: ToastController
-    , private inventoryService: InventoryService
+    , private inventoryService: InventoryService,
+    private alertCtrl: AlertController,
+    public charService: CharacterService
   ) {
     addIcons({ settingsOutline });
     addIcons({
@@ -72,7 +76,7 @@ export class DashboardPage implements AfterViewInit, OnDestroy {
       people, pizza, planet, restaurant, shapes, shirt, sparkles, star,
       storefront, terminal, thumbsUp, timer, tv, umbrella, videocam, walk,
       wallet, wifi, wine, accessibility, basket, beer, camera, car,
-      chatbubble, clipboard, colorPalette, desktop
+      chatbubble, clipboard, colorPalette, desktop, flame
     });
   }
 
@@ -248,6 +252,42 @@ export class DashboardPage implements AfterViewInit, OnDestroy {
     this.renderer.render(this.scene, this.camera);
   }
 
+  // New Method: Delete with Confirmation
+  async deleteHabit(habit: Habit) {
+    const alert = await this.alertCtrl.create({
+      header: 'Delete Habit?',
+      message: `Are you sure you want to remove "${habit.title}"?`,
+      buttons: [
+        {
+          text: 'Cancel',
+          role: 'cancel'
+        },
+        {
+          text: 'Delete',
+          role: 'destructive',
+          handler: () => {
+            this.habitService.deleteHabit(habit.id);
+            this.refreshData(); // Reload list
+
+            // Optional: Show feedback
+            this.showToast('Habit deleted');
+          }
+        }
+      ]
+    });
+
+    await alert.present();
+  }
+
+  async showToast(msg: string) {
+    const toast = await this.toastCtrl.create({
+      message: msg,
+      duration: 1500,
+      position: 'bottom'
+    });
+    toast.present();
+  }
+
   async onToggleHabit(event: any, habit: Habit) {
     // Prevent default simple toggling behavior
     const isChecking = event.detail.checked;
@@ -278,7 +318,7 @@ export class DashboardPage implements AfterViewInit, OnDestroy {
       // User selected a mood and confirmed
       // 1. Mark complete
       this.habitService.completeHabit(habit.id, data);
-
+      this.charService.notifyHabitComplete(habit.streak); // <--- ADD THIS
       this.openReward();
       this.refreshData();
 

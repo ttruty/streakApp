@@ -43,14 +43,14 @@ export class RewardModalComponent implements OnInit {
   const gridSize = 9;
 
   // 1. Determine how many items to drop (e.g., Random between 1 and 5)
-  const itemsToDropCount = Math.floor(Math.random() * 5) + 1;
+  // const itemsToDropCount = Math.floor(Math.random() * 5) + 1;
 
   // 2. Select random items from the pool
-  const selectedItems: Item[] = [];
-  for (let i = 0; i < itemsToDropCount; i++) {
-    const randomItem = this.possibleRewards[Math.floor(Math.random() * this.possibleRewards.length)];
-    selectedItems.push({ ...randomItem });
-  }
+  const selectedItems: Item[] = this.possibleRewards;
+  // for (let i = 0; i < itemsToDropCount; i++) {
+  //   const randomItem = this.possibleRewards[Math.floor(Math.random() * this.possibleRewards.length)];
+  //   selectedItems.push({ ...randomItem });
+  // }
   this.collectedItems = selectedItems;
 
   // 3. Create the grid with NULLs (empty)

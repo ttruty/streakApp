@@ -27,13 +27,46 @@ export class HabitService {
 
   getHabits(): Habit[] {
     const data = localStorage.getItem(this.STORAGE_KEY);
-    return data ? JSON.parse(data) : [];
+
+    // 1. If data exists, return it
+    if (data) {
+      return JSON.parse(data);
+    }
+
+    // 2. If NO data exists (First time user), create default
+    else {
+      const starterHabits: Habit[] = [
+        {
+          id: 'default_water',
+          title: 'Drink Water',
+          icon: 'water', // Make sure this matches your registered icons
+          type: 'regular',
+          frequency: 'daily',
+          reward: 'low',
+          completed: false,
+          streak: 0,
+          history: []
+        }
+      ];
+
+      // Save it immediately so it persists
+      this.updateHabits(starterHabits);
+
+      return starterHabits;
+    }
   }
 
   addHabit(habit: Habit) {
     const habits = this.getHabits();
     habits.push(habit);
     localStorage.setItem(this.STORAGE_KEY, JSON.stringify(habits));
+  }
+
+  deleteHabit(id: string) {
+    let habits = this.getHabits();
+    // Keep only the habits that DO NOT match the ID
+    habits = habits.filter(h => h.id !== id);
+    this.updateHabits(habits);
   }
 
   updateHabits(habits: Habit[]) {

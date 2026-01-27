@@ -1,0 +1,58 @@
+<ion-header [translucent]="true" class="ion-no-border">
+  <ion-toolbar>
+    <ion-title>My Raider</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+
+  <div class="hero-section">
+    <div class="level-circle">
+      <span class="lvl-label">Level {{ state.level }}</span>
+      <!-- <span class="lvl-num">{{ state.level }}</span> -->
+    </div>
+
+    <div class="xp-container">
+      <div class="xp-text">
+        <span>XP</span>
+        <span>{{ state.currentXp }} / {{ state.maxXp }}</span>
+      </div>
+      <ion-progress-bar [value]="state.currentXp / state.maxXp" color="tertiary"></ion-progress-bar>
+    </div>
+  </div>
+
+  <div class="achievements-section">
+    <h3>Achievements</h3>
+
+    <div *ngFor="let ach of achievements" class="ach-card" [class.completed]="ach.completed">
+
+      <div class="ach-header">
+        <div class="ach-info">
+          <h4>{{ ach.title }}</h4>
+          <p>{{ ach.description }}</p>
+        </div>
+        <div class="xp-badge" *ngIf="!ach.claimed">+{{ ach.xpReward }} XP</div>
+        <ion-icon name="checkmark-circle" color="success" *ngIf="ach.claimed"></ion-icon>
+      </div>
+
+      <div class="ach-progress" *ngIf="!ach.claimed">
+        <ion-progress-bar
+          [value]="ach.currentValue / ach.targetValue"
+          [color]="ach.completed ? 'success' : 'primary'">
+        </ion-progress-bar>
+        <span class="progress-text">{{ ach.currentValue }} / {{ ach.targetValue }}</span>
+      </div>
+
+      <ion-button
+        *ngIf="ach.completed && !ach.claimed"
+        expand="block"
+        color="success"
+        size="small"
+        (click)="claim(ach)">
+        Claim Reward
+      </ion-button>
+
+    </div>
+  </div>
+
+</ion-content>

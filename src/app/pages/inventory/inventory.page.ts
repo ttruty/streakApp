@@ -11,6 +11,7 @@ import {
 } from 'ionicons/icons';
 import { ViewDidEnter } from '@ionic/angular/standalone';
 import { Item, InventoryService } from 'src/app/services/inventory';
+import { CharacterService } from 'src/app/services/character';
 
 @Component({
   selector: 'app-inventory',
@@ -27,13 +28,15 @@ export class InventoryPage implements ViewDidEnter {
   constructor(
     private inventoryService: InventoryService,
     private actionSheetCtrl: ActionSheetController,
-    private toastCtrl: ToastController
+    private toastCtrl: ToastController,
+    private charService: CharacterService,
   ) {
     addIcons({ cubeOutline, cashOutline, flask, diamond, flame, trash, handLeft, pricetag });
   }
 
   ionViewDidEnter() {
     this.loadData();
+    this.charService.notifyInventoryUpdate(this.items); // <--- ADD THIS
   }
 
   loadData() {

@@ -36,19 +36,19 @@
 
   // Dynamic Colors
   &.low {
-    background: #f0f0f0;
+    background: #222222;
     color: #666;
     border-color: #999;
   }
   &.medium {
-    background: #e3f2fd;
+    background: #222222;
     color: #1976d2;
     border-color: #1976d2;
   }
   &.high {
-    background: #fff8e1;
-    color: #fbc02d;
-    border-color: #fbc02d;
+    background: #222222;
+    color: #cb2dfb;
+    border-color: #e32dfb;
   }
 }
 
@@ -72,7 +72,7 @@
 }
 
 .icon-picker-section {
-  background: white;
+  background: rgb(59, 59, 59);
   padding: 15px;
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.05);
@@ -100,7 +100,7 @@
   width: 45px;
   height: 45px;
   border-radius: 50%;
-  background: #f5f5f5;
+  background: #575757;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -111,14 +111,14 @@
 
   &.selected {
     background: var(--ion-color-primary);
-    color: white;
+    color: rgb(145, 145, 145);
     transform: scale(1.1);
     box-shadow: 0 4px 10px rgba(var(--ion-color-primary-rgb), 0.4);
   }
 }
 
 .icon-picker-section {
-  background: white;
+  background: rgb(90, 90, 90);
   padding: 15px;
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.05);
@@ -128,7 +128,7 @@
     display: block;
     margin-bottom: 10px;
     font-weight: 600;
-    color: #888;
+    color: #c3c3c3;
     font-size: 11px;
     text-transform: uppercase;
     letter-spacing: 1px;
@@ -141,7 +141,7 @@
   align-items: center;
   gap: 15px;
   padding: 10px;
-  background: #f9f9f9;
+  background: #000000;
   border-radius: 12px;
   cursor: pointer;
   transition: background 0.2s;
@@ -220,7 +220,7 @@
 
   &.selected {
     background: var(--ion-color-dark); // Use dark for grid selection to contrast with primary preview
-    color: white;
+    color: rgb(86, 157, 255);
     transform: scale(1.1);
   }
 }

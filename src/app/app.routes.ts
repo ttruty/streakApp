@@ -27,10 +27,18 @@ export const routes: Routes = [
         loadComponent: () => import('./pages/inventory/inventory.page').then(m => m.InventoryPage),
       },
       {
+        path: 'character',
+        loadComponent: () => import('./pages/character/character.page').then(m => m.CharacterPage)
+      },
+      {
         path: '',
         redirectTo: '/tabs/dashboard',
         pathMatch: 'full',
       },
     ],
+  },
+  {
+    path: 'character',
+    loadComponent: () => import('./pages/character/character.page').then( m => m.CharacterPage)
   },
 ];
