@@ -1,6 +1,6 @@
 {
   "configVersion": 1,
-  "timestamp": 1769540230157,
+  "timestamp": 1769541164033,
   "index": "/streakApp/index.html",
   "assetGroups": [
     {
@@ -143,6 +143,7 @@
         "/streakApp/chunk-ZP6ROK2P.js",
         "/streakApp/index.html",
         "/streakApp/main-P5UT753F.js",
+        "/streakApp/manifest.webmanifest",
         "/streakApp/polyfills-TDCRLYKL.js",
         "/streakApp/styles-6KTEQGYX.css"
       ],
@@ -157,7 +158,15 @@
       },
       "urls": [
         "/streakApp/assets/icon/favicon.png",
-        "/streakApp/assets/shapes.svg"
+        "/streakApp/assets/shapes.svg",
+        "/streakApp/icons/icon-128x128.png",
+        "/streakApp/icons/icon-144x144.png",
+        "/streakApp/icons/icon-152x152.png",
+        "/streakApp/icons/icon-192x192.png",
+        "/streakApp/icons/icon-384x384.png",
+        "/streakApp/icons/icon-512x512.png",
+        "/streakApp/icons/icon-72x72.png",
+        "/streakApp/icons/icon-96x96.png"
       ],
       "patterns": []
     }
@@ -296,8 +305,17 @@
     "/streakApp/chunk-Z3Y3KHZZ.js": "31a917858d60178639ef033688d0e0bf9b266bd5",
     "/streakApp/chunk-Z5NX2RWI.js": "112e210280097d12af21f93fff9c33bbe179b268",
     "/streakApp/chunk-ZP6ROK2P.js": "95063bb5384de515e67573259c7ffbaddfc0eab7",
+    "/streakApp/icons/icon-128x128.png": "f912963bdc6d5a38d8f1dd0afbaab2ce8d657acb",
+    "/streakApp/icons/icon-144x144.png": "b155fd5f2fd5d2ea7760721063003c4cd95fd783",
+    "/streakApp/icons/icon-152x152.png": "eae6e0f0c8afb8aaae339e2a569b43e9238e5e6c",
+    "/streakApp/icons/icon-192x192.png": "15c4180454633880d98674aa7394656196c91584",
+    "/streakApp/icons/icon-384x384.png": "94a915751ef6c9282df9aea405ad679230631814",
+    "/streakApp/icons/icon-512x512.png": "1de182f76f7329dfa8f9fcdd1fdcdd695bea6a99",
+    "/streakApp/icons/icon-72x72.png": "aa88a6096bd973be7f6d7a5489bfa6bc2463f8c4",
+    "/streakApp/icons/icon-96x96.png": "7fb8f59c30ce2ff12c700321a0b39e14b3dc8f95",
     "/streakApp/index.html": "2143ae09e9f5be7e9df3837a944db42f1a335d7b",
     "/streakApp/main-P5UT753F.js": "b40eee1c566032018887fda4210f6884a3656eb6",
+    "/streakApp/manifest.webmanifest": "ea769706c4a59e364d0877b9ef23326f040ace36",
     "/streakApp/polyfills-TDCRLYKL.js": "454f6db4230cc7ab61b24fe465dcc92bf041737d",
     "/streakApp/styles-6KTEQGYX.css": "17b3b370b6b6202072398ab0aece94733ee11279"
   },
