@@ -1,8 +1,9 @@
 {
-  "name": "streakApp",
+  "name": "ARC Runners",
+  "license": "MIT",
   "version": "0.0.1",
-  "author": "Ionic Framework",
-  "homepage": "https://ionicframework.com/",
+  "author": "TRUTY",
+  "homepage": "https://timtruty.com/streakApp",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",

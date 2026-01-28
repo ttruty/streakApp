@@ -1,0 +1,5 @@
+<div class="character-section">
+  <canvas #rendererCanvas class="three-canvas" (click)="onCharacterTouch()"></canvas>
+  <div class="level-badge">Level {{ charService.state.level }}</div>
+  <div class="xp-badge">{{ charService.state.currentXp }} / {{ charService.state.maxXp }} XP</div>
+</div>

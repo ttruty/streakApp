@@ -6,58 +6,6 @@
 }
 
 
-.character-section {
-  flex: 1;
-  height: 50vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  background: linear-gradient(to bottom, #e0f7fa, #000000);
-  position: relative;
-  overflow: hidden; // Keeps the canvas contained
-  min-height: 40vh;
-
-  .three-canvas {
-    width: 100%;
-    height: 100%;
-    display: block; // Removes default inline spacing
-    outline: none;
-  }
-
-  .level-badge {
-    position: absolute;
-    bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: var(--ion-color-primary);
-    color: white;
-    padding: 5px 15px;
-    border-radius: 20px;
-    font-weight: bold;
-    z-index: 10;
-  }
-
-
-  .xp-badge {
-    position: absolute;
-    top: 0;
-    right: 0;
-    align-items: center;
-    gap: 5px;
-    background: #303030;
-    padding: 5px 12px;
-    border-radius: 20px;
-    border: 1px solid #4b60ff;
-
-    span {
-      font-weight: bold;
-      color: #f57f17;
-    }
-  }
-}
-
-
 .habits-section {
   /* --- SCROLLING MAGIC --- */
   overflow-y: auto; /* Allows this specific box to scroll */
@@ -132,4 +80,42 @@ ion-item-sliding {
     color: white;
     letter-spacing: 0.5px;
   }
+}
+
+.meta-row {
+  display: flex;
+  gap: 8px; /* Space between Streak and Stat */
+  margin-top: 6px;
+}
+
+/* --- STAT BADGE --- */
+.stat-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  background: rgba(0,0,0,0.2); /* Fallback dark background */
+  color: white;
+  border: 1px solid rgba(255,255,255,0.1);
+
+  ion-icon {
+    font-size: 12px;
+  }
+
+  /* COLOR CODING */
+  &.strength     { background: rgba(244, 67, 54, 0.2); color: #ff8a80; border-color: #f44336; }
+  &.intelligence { background: rgba(33, 150, 243, 0.2); color: #90caf9; border-color: #2196f3; }
+  &.constitution { background: rgba(76, 175, 80, 0.2);  color: #a5d6a7; border-color: #4caf50; }
+  &.dexterity    { background: rgba(255, 152, 0, 0.2);  color: #ffcc80; border-color: #ff9800; }
+  &.charisma     { background: rgba(156, 39, 176, 0.2); color: #ce93d8; border-color: #9c27b0; }
+}
+
+/* Update Streak Chip to match size if needed */
+.streak-chip {
+  /* ... keep existing styles ... */
+  height: fit-content;
 }

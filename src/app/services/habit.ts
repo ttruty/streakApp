@@ -1,5 +1,9 @@
 import { Injectable } from '@angular/core';
 
+// Add these types at the top
+export type StatType = 'strength' | 'intelligence' | 'constitution' | 'dexterity' | 'charisma';
+export type Difficulty = 'easy' | 'medium' | 'hard';
+
 export interface Habit {
   id: string;
   title: string;
@@ -10,6 +14,8 @@ export interface Habit {
   completed: boolean;
   streak: number;
   history: HabitLog[];
+  associatedStat: StatType;
+  difficulty: Difficulty;
 }
 
 export interface HabitLog {
@@ -45,7 +51,10 @@ export class HabitService {
           reward: 'low',
           completed: false,
           streak: 0,
-          history: []
+          history: [],
+          associatedStat: 'constitution',
+          difficulty: 'medium'
+
         }
       ];
 

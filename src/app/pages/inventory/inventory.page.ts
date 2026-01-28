@@ -7,7 +7,10 @@ import {
 import { addIcons } from 'ionicons';
 import {
   cubeOutline, cashOutline, flask, diamond, flame,
-  trash, handLeft, pricetag
+  diamondOutline, keyOutline, shieldOutline, hammerOutline, leafOutline, skullOutline, flaskOutline
+
+  ,trash, handLeft, pricetag,
+  mapOutline
 } from 'ionicons/icons';
 import { ViewDidEnter } from '@ionic/angular/standalone';
 import { Item, InventoryService } from 'src/app/services/inventory';
@@ -31,7 +34,7 @@ export class InventoryPage implements ViewDidEnter {
     private toastCtrl: ToastController,
     private charService: CharacterService,
   ) {
-    addIcons({ cubeOutline, cashOutline, flask, diamond, flame, trash, handLeft, pricetag });
+    addIcons({ cubeOutline, cashOutline, flask, diamond, flame, trash, handLeft, pricetag, diamondOutline, keyOutline, shieldOutline, hammerOutline, leafOutline, skullOutline, mapOutline, flaskOutline });
   }
 
   ionViewDidEnter() {

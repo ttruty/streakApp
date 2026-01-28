@@ -11,9 +11,9 @@ import { addIcons } from 'ionicons';
 import { settingsOutline, flame } from 'ionicons/icons';
 import { ToastController } from '@ionic/angular/standalone';
 
-// Three.js Imports
-import * as THREE from 'three';
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+// // Three.js Imports
+// import * as THREE from 'three';
+// import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { RewardModalComponent } from 'src/app/components/reward-modal/reward-modal.component';
 import { InventoryService, Item } from 'src/app/services/inventory';
 import { ModalController } from '@ionic/angular/standalone';
@@ -30,6 +30,7 @@ import {
 } from 'ionicons/icons';
 import { CompletionModalComponent } from '../../components/completion-modal/completion-modal.component';
 import { CharacterService } from 'src/app/services/character';
+import { CharacterModelComponent } from 'src/app/components/character-model/character-model.component';
 
 @Component({
   selector: 'app-dashboard',
@@ -39,31 +40,21 @@ import { CharacterService } from 'src/app/services/character';
   imports: [
     CommonModule,
     FormsModule,
+    CharacterModelComponent,
     IonContent, IonHeader, IonTitle, IonToolbar, IonButtons,
     IonMenuButton, IonButton, IonIcon, IonList, IonItem,
     IonLabel, IonCheckbox, IonItemSliding, IonItemOptions, IonItemOption
   ]
 })
-export class DashboardPage implements AfterViewInit, OnDestroy {
-
-  @ViewChild('rendererCanvas', { static: false }) rendererCanvas!: ElementRef;
-
-  // Three.js variables
-  renderer!: THREE.WebGLRenderer;
-  scene!: THREE.Scene;
-  camera!: THREE.PerspectiveCamera;
-  mixer!: THREE.AnimationMixer;
-  clock = new THREE.Clock();
-  animationId: number = 0;
-  spinSpeed: number = 0; // How fast it is currently spinning
-  model!: THREE.Object3D;
-
+export class DashboardPage {
 
   habits: Habit[] = []; // Change to use Habit interface
 
-  constructor(private modalCtrl: ModalController, private habitService: HabitService
-    , private toastCtrl: ToastController
-    , private inventoryService: InventoryService,
+  constructor(
+    private modalCtrl: ModalController,
+    private habitService: HabitService,
+    private toastCtrl: ToastController,
+    private inventoryService: InventoryService,
     private alertCtrl: AlertController,
     public charService: CharacterService
   ) {
@@ -130,127 +121,7 @@ export class DashboardPage implements AfterViewInit, OnDestroy {
     }
   }
 
-  // Initialize Three.js after the view loads
-  ngAfterViewInit() {
-    this.initThree();
-  }
 
-  // Clean up memory when leaving the page
-  ngOnDestroy() {
-    if (this.animationId) {
-      cancelAnimationFrame(this.animationId);
-    }
-    if (this.renderer) {
-      this.renderer.dispose();
-    }
-  }
-
-  onCharacterTouch() {
-    // Set a sudden speed (30 degrees per frame roughly)
-    this.spinSpeed = 0.5;
-  }
-
-  initThree() {
-    // 1. Get the container dimensions
-    const container = this.rendererCanvas.nativeElement.parentElement;
-    const width = container.clientWidth;
-    const height = container.clientHeight;
-
-    console.log(`Canvas Size: ${width}px x ${height}px`); // <--- CHECK THIS LOG
-
-    if (width === 0 || height === 0) {
-      console.error('Canvas has no size! Waiting for layout...');
-      setTimeout(() => this.initThree(), 100); // Try again in 100ms
-      return;
-    }
-
-    console.log('Initializing Three.js scene');
-
-    // 2. Setup Scene
-    this.scene = new THREE.Scene();
-    this.scene.background = new THREE.Color(0x333333); // Dark Grey
-
-    // 3. Camera (FOV, Aspect, Near, Far)
-    this.camera = new THREE.PerspectiveCamera(50, width / height, 0.1, 1000);
-    this.camera.position.z = 3; // Move back 3 units
-    this.camera.position.y = -0.2; // Move back 3 units
-
-    // 4. Renderer
-    this.renderer = new THREE.WebGLRenderer({
-      canvas: this.rendererCanvas.nativeElement,
-      antialias: true
-    });
-    this.renderer.setSize(width, height);
-
-    // 5. DEBUG CUBE (Bright Red)
-    const geometry = new THREE.BoxGeometry();
-    const material = new THREE.MeshBasicMaterial({ color: 0xff0000 });
-    const cube = new THREE.Mesh(geometry, material);
-    // this.scene.add(cube);
-
-    // 6. Lights
-    const light = new THREE.DirectionalLight(0xffffff, 2);
-    light.position.set(2, 2, 5);
-    this.scene.add(light);
-    this.scene.add(new THREE.AmbientLight(0xffffff, 0.5));
-
-    // 7. Load Model
-    const loader = new GLTFLoader();
-    loader.load('assets/character.glb', (gltf) => {
-      console.log('Model loaded!');
-      this.model = gltf.scene;
-
-      // Scale might be huge or tiny, let's normalize it
-      this.model.scale.set(1, 1, 1);
-      this.model.position.set(0, -1, 0);
-
-      this.scene.add(this.model);
-
-      console.log('Animations found:', gltf.animations); // <--- CHECK CONSOLE
-
-      if (gltf.animations && gltf.animations.length > 0) {
-        this.mixer = new THREE.AnimationMixer(gltf.scene);
-
-        // Play the first animation (usually "Armature|mixamo.com|Layer0")
-        const action = this.mixer.clipAction(gltf.animations[0]);
-        action.play();
-      } else {
-        console.warn('No animations found in this GLB!');
-      }
-
-      // If we see the model, remove the cube
-      // this.scene.remove(cube);
-
-    }, undefined, (err) => console.error(err));
-
-    // Start Loop
-    this.animate();
-  }
-
-  animate() {
-    requestAnimationFrame(() => this.animate());
-
-    // 1. Get the time passed since the last frame
-    const delta = this.clock.getDelta();
-
-    // 2. Update the mixer (this moves the bones)
-    if (this.mixer) {
-      this.mixer.update(delta);
-    }
-
-    if (this.model && this.spinSpeed > 0.001) {
-      // 1. Rotate the model by current speed
-      this.model.rotation.y += this.spinSpeed;
-
-      // 2. Apply Friction (slow it down by 5% every frame)
-      this.spinSpeed *= 0.95;
-    } else {
-        // Stop completely if very slow
-        this.spinSpeed = 0;
-    }
-
-    this.renderer.render(this.scene, this.camera);
-  }
 
   // New Method: Delete with Confirmation
   async deleteHabit(habit: Habit) {
@@ -279,6 +150,23 @@ export class DashboardPage implements AfterViewInit, OnDestroy {
     await alert.present();
   }
 
+   getStatIcon(stat: string): string {
+    switch(stat) {
+      case 'strength': return 'barbell';
+      case 'intelligence': return 'book';
+      case 'constitution': return 'heart';
+      case 'dexterity': return 'flash';
+      case 'charisma': return 'chatbubble';
+      default: return 'help-circle';
+    }
+  }
+
+  // 4. OPTIONAL: HELPER FOR SHORT NAMES
+  getStatLabel(stat: string): string {
+    if (!stat) return '';
+    return stat.substring(0, 3).toUpperCase(); // Returns STR, INT, etc.
+  }
+
   async showToast(msg: string) {
     const toast = await this.toastCtrl.create({
       message: msg,
@@ -295,6 +183,7 @@ export class DashboardPage implements AfterViewInit, OnDestroy {
     // If we are unchecking, just do it directly
     if (!isChecking) {
       this.habitService.uncompleteHabit(habit.id);
+      this.charService.modifyStat(habit.associatedStat, habit.difficulty, true);
       this.refreshData(); // Helper to reload list
       return;
     }
@@ -319,9 +208,9 @@ export class DashboardPage implements AfterViewInit, OnDestroy {
       // 1. Mark complete
       this.habitService.completeHabit(habit.id, data);
       this.charService.notifyHabitComplete(habit.streak); // <--- ADD THIS
-      this.openReward();
-      this.refreshData();
+      this.charService.modifyStat(habit.associatedStat, habit.difficulty, false);
 
+      this.openReward();
       this.refreshData(); // Reload from service to show checked state
     } else {
       // User cancelled modal -> keep it unchecked (which we already did)

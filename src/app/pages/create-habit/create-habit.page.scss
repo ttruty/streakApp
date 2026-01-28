@@ -1,3 +1,89 @@
+.split-row {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 10px;
+
+  ion-item {
+    flex: 1; /* Both take 50% width */
+    --border-radius: 12px;
+    --background: #3b3b3b;
+  }
+}
+
+.visual-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+/* --- VISUAL CARDS (Icon & Loot) --- */
+.visual-card {
+  background: #363636;
+  border-radius: 12px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  position: relative; /* For the overlay select */
+  border: 2px solid transparent;
+  transition: 0.2s;
+
+  &:active { background: #e0e0e0; }
+
+  .label {
+    font-size: 11px;
+    text-transform: uppercase;
+    color: #ffffff;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+
+  .visual-content {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    ion-icon {
+      font-size: 24px;
+      color: #ffffff;
+    }
+
+    .value-text {
+      font-size: 14px;
+      font-weight: 600;
+      color: #e6e6e6;
+      text-transform: capitalize;
+    }
+  }
+
+  /* Loot Colors */
+  .visual-content.low ion-icon { color: #78909c; }
+  .visual-content.medium ion-icon { color: #1e88e5; }
+  .visual-content.high ion-icon { color: #ffab00; }
+}
+
+/* --- HIDDEN SELECT TRICK --- */
+/* We make the ion-select invisible but clickable on top of the card */
+.overlay-select {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0; /* Invisible */
+  z-index: 10;
+}
+
+/* --- ICON GRID (Existing) --- */
+.icon-grid-wrapper {
+  background: #f4f5f8;
+  border-radius: 12px;
+  padding: 10px;
+  margin-bottom: 15px;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
 .custom-segment {
   margin-bottom: 20px;
   --background: #363636;
@@ -88,34 +174,6 @@
   }
 }
 
-
-.icon-grid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  justify-content: center;
-}
-
-.icon-option {
-  width: 45px;
-  height: 45px;
-  border-radius: 50%;
-  background: #575757;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 22px;
-  color: #666;
-  transition: all 0.2s ease;
-  cursor: pointer;
-
-  &.selected {
-    background: var(--ion-color-primary);
-    color: rgb(145, 145, 145);
-    transform: scale(1.1);
-    box-shadow: 0 4px 10px rgba(var(--ion-color-primary-rgb), 0.4);
-  }
-}
 
 .icon-picker-section {
   background: rgb(90, 90, 90);
@@ -224,3 +282,5 @@
     transform: scale(1.1);
   }
 }
+
+

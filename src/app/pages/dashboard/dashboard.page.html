@@ -3,7 +3,7 @@
     <ion-buttons slot="start">
       <ion-menu-button></ion-menu-button>
     </ion-buttons>
-    <ion-title>ARC Readers</ion-title>
+    <ion-title>ARC Runners</ion-title>
     <ion-buttons slot="end">
       <ion-button>
         <ion-icon name="settings-outline"></ion-icon>
@@ -15,13 +15,7 @@
 <ion-content [fullscreen]="true" scrollY="false">
   <div class="split-layout">
 
-    <div class="character-section">
-      <canvas #rendererCanvas class="three-canvas"
-      (click)="onCharacterTouch()">
-      ></canvas>
-      <div class="level-badge">Level {{ charService.state.level }}</div>
-      <div class="xp-badge">{{ charService.state.currentXp }} / {{ charService.state.maxXp }} XP</div>
-    </div>
+    <app-character-model></app-character-model>
 
     <div class="habits-section">
       <h3>Today's Quests</h3>
@@ -49,6 +43,11 @@
                 <span>{{ habit.streak }} Days</span>
               </div>
              </ion-label>
+
+             <div class="stat-chip" [ngClass]="habit.associatedStat">
+                  <ion-icon [name]="getStatIcon(habit.associatedStat)"></ion-icon>
+                  <span>{{ (habit.associatedStat) }}</span>
+              </div>
           </ion-item>
 
           <ion-item-options side="end">

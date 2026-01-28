@@ -18,7 +18,7 @@ import {
   paw, pencil, people, pizza, planet, restaurant, rocket, rose, school,
   shapes, shirt, skull, sparkles, star, storefront, sunny, terminal,
   thumbsUp, timer, trash, trophy, tv, umbrella, videocam, walk, wallet,
-  water, wifi, wine
+  water, wifi, wine, flash
 } from 'ionicons/icons';
 import { chevronDownOutline, chevronUpOutline } from 'ionicons/icons';
 
@@ -47,6 +47,11 @@ export class CreateHabitPage {
   randomCount: string = '1';
   randomPeriod: string = 'day';
 
+  selectedStat: any = 'constitution';
+  selectedDifficulty: any = 'medium';
+
+  newHabit!: Habit;
+
   availableIcons = [
     'water', 'barbell', 'book', 'bed', 'bicycle', 'briefcase',
     'game-controller', 'fast-food', 'musical-notes', 'paw', 'sunny',
@@ -62,7 +67,7 @@ export class CreateHabitPage {
     'pencil', 'people', 'pizza', 'planet', 'restaurant', 'shapes', 'shirt',
     'sparkles', 'star', 'storefront', 'terminal', 'thumbs-up', 'timer', 'tv',
     'umbrella', 'videocam', 'walk', 'wallet', 'wifi', 'wine', 'gift', 'dice-outline',
-    'chevron-down-outline', 'chevron-up-outline'
+    'chevron-down-outline', 'chevron-up-outline', 'flash'
   ];
 
   selectedIcon: string = 'water'; // Default selection
@@ -96,18 +101,21 @@ export class CreateHabitPage {
       freqString = `${this.randomCount} times per ${this.randomPeriod}`;
     }
 
-    const newHabit: Habit = {
+   this.newHabit = {
       id: Date.now().toString(),
       title: this.habitName,
+      associatedStat: this.selectedStat,       // <--- HERE
+      difficulty: this.selectedDifficulty,     // <--- AND HERE
       icon: this.selectedIcon,
       type: this.habitType,
       frequency: freqString,
       reward: this.lootLevel,
       completed: false,
-      streak: 0, history: []
+      streak: 0,
+      history: []
     };
 
-    this.habitService.addHabit(newHabit);
+    this.habitService.addHabit(this.newHabit);
 
     const toast = await this.toastCtrl.create({
       message: 'Habit Created!',

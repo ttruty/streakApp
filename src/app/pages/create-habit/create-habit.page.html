@@ -16,66 +16,81 @@
   </ion-segment>
 
   <div class="form-container">
-<div class="icon-picker-section">
-      <ion-label class="section-label">Icon</ion-label>
+    <ion-item class="input-item">
+      <ion-label position="stacked">Quest Title</ion-label>
+      <ion-input [(ngModel)]="habitName" placeholder="e.g. Slay the Dragon"></ion-input>
+    </ion-item>
 
-      <div class="icon-trigger" (click)="toggleIconPicker()">
-        <div class="selected-preview">
+    <div class="split-row">
+
+      <ion-item class="input-item">
+        <ion-label position="stacked">Stat</ion-label>
+        <ion-select [(ngModel)]="selectedStat" interface="popover">
+          <ion-select-option value="strength">STRENGTH</ion-select-option>
+          <ion-select-option value="intelligence">INTELLIGENCE</ion-select-option>
+          <ion-select-option value="constitution">CONSTITUTION</ion-select-option>
+          <ion-select-option value="dexterity">DEXTERITY</ion-select-option>
+          <ion-select-option value="charisma">CHARISMA</ion-select-option>
+        </ion-select>
+      </ion-item>
+
+      <ion-item class="input-item">
+        <ion-label position="stacked">Difficulty</ion-label>
+        <ion-select [(ngModel)]="selectedDifficulty" interface="popover">
+          <ion-select-option value="easy">Easy</ion-select-option>
+          <ion-select-option value="medium">Medium</ion-select-option>
+          <ion-select-option value="hard">Hard</ion-select-option>
+        </ion-select>
+      </ion-item>
+
+    </div>
+
+    <div class="visual-row">
+
+      <div class="visual-card" (click)="toggleIconPicker()">
+        <span class="label">Icon</span>
+        <div class="visual-content">
           <ion-icon [name]="selectedIcon"></ion-icon>
+          <span class="value-text">{{ selectedIcon }}</span>
         </div>
-        <div class="trigger-text">
-          <span>{{ selectedIcon | titlecase }}</span>
-          <p>Tap to change</p>
-        </div>
-        <ion-icon
-          [name]="isIconPickerExpanded ? 'chevron-up-outline' : 'chevron-down-outline'"
-          class="arrow-icon">
-        </ion-icon>
       </div>
 
-      <div class="icon-grid-wrapper" *ngIf="isIconPickerExpanded">
-        <div class="icon-grid">
-          <div
-            *ngFor="let icon of availableIcons"
-            class="icon-option"
-            [class.selected]="selectedIcon === icon"
-            (click)="selectIcon(icon)">
-            <ion-icon [name]="icon"></ion-icon>
-          </div>
+      <div class="visual-card relative-card">
+        <span class="label">Reward</span>
+
+        <ion-select [(ngModel)]="lootLevel" interface="action-sheet" class="overlay-select">
+          <ion-select-option value="low">Low (Common)</ion-select-option>
+          <ion-select-option value="medium">Medium (Rare)</ion-select-option>
+          <ion-select-option value="high">High (Legendary)</ion-select-option>
+        </ion-select>
+
+        <div class="visual-content" [ngClass]="lootLevel">
+          <ion-icon name="gift" *ngIf="lootLevel === 'low'"></ion-icon>
+          <ion-icon name="sparkles" *ngIf="lootLevel === 'medium'"></ion-icon>
+          <ion-icon name="trophy" *ngIf="lootLevel === 'high'"></ion-icon>
+          <span class="value-text">{{ lootLevel | titlecase }}</span>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="icon-grid-wrapper" *ngIf="isIconPickerExpanded">
+      <div class="icon-grid">
+        <div *ngFor="let icon of availableIcons" class="icon-option"
+             [class.selected]="selectedIcon === icon" (click)="selectIcon(icon)">
+          <ion-icon [name]="icon"></ion-icon>
         </div>
       </div>
     </div>
 
-    <ion-item class="input-item">
-      <ion-label position="stacked">Habit Name</ion-label>
-      <ion-input [(ngModel)]="habitName" placeholder="e.g. Drink Water"></ion-input>
-    </ion-item>
-
-    <div *ngIf="habitType === 'regular'">
-
+    <div *ngIf="habitType === 'regular'" class="frequency-section">
       <ion-item class="input-item">
-        <ion-label position="stacked">Goal Frequency</ion-label>
+        <ion-label position="stacked">Frequency</ion-label>
         <ion-select [(ngModel)]="frequency" interface="popover">
-          <ion-select-option value="daily">Every Day</ion-select-option>
-          <ion-select-option value="weekly">Once a Week</ion-select-option>
-          <ion-select-option value="weekdays">Weekdays Only</ion-select-option>
+          <ion-select-option value="daily">Daily</ion-select-option>
+          <ion-select-option value="weekly">Weekly</ion-select-option>
         </ion-select>
       </ion-item>
-
-      <ion-item class="input-item">
-        <ion-label position="stacked">Loot Reward</ion-label>
-        <ion-select [(ngModel)]="lootLevel" interface="action-sheet">
-          <ion-select-option value="low">Low Loot (Common)</ion-select-option>
-          <ion-select-option value="medium">Medium Loot (Rare)</ion-select-option>
-          <ion-select-option value="high">High Loot (Legendary)</ion-select-option>
-        </ion-select>
-      </ion-item>
-
-      <div class="loot-preview" [ngClass]="lootLevel">
-        <ion-icon name="gift"></ion-icon>
-        <p>{{ lootLevel | titlecase }} Reward</p>
-      </div>
-
     </div>
 
     <div *ngIf="habitType === 'random'">

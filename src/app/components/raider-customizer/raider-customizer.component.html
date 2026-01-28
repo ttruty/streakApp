@@ -1,0 +1,53 @@
+<div class="customizer-layout">
+
+  <div class="scene-area">
+
+    <div class="scene-overlay">
+      <ion-button size="large" fill="solid" color="light" (click)="saveLoadout()">
+        <ion-icon name="save-outline" slot="start"></ion-icon>
+        Save
+      </ion-button>
+    </div>
+
+    <div class="canvas-wrapper">
+      <canvas #rendererCanvas (touchstart)="onCharacterTouch()"></canvas>
+
+      <div *ngIf="isLoading" class="loading-overlay">
+        <ion-spinner name="crescent"></ion-spinner>
+      </div>
+    </div>
+  </div>
+
+  <div class="controls-area">
+
+    <div class="category-bar">
+      <div
+        class="category-item"
+        *ngFor="let cat of categories"
+        [class.active]="selectedCategory === cat.id"
+        (click)="selectCategory(cat.id)">
+        <ion-icon [name]="cat.icon"></ion-icon>
+        <span>{{ cat.label }}</span>
+      </div>
+    </div>
+
+    <div class="options-scroller">
+      <div class="option-card" (click)="selectOption(null)" *ngIf="selectedCategory !== 'base'">
+        <div class="option-thumb none-thumb">
+          <ion-icon name="close-circle-outline"></ion-icon>
+        </div>
+        <span>None</span>
+      </div>
+
+      <div
+        class="option-card"
+        *ngFor="let item of getOptionsForCategory()"
+        (click)="selectOption(item)"
+        [class.selected]="isEquipped(item)">
+        <img [src]="item.thumbnail" class="option-thumb" alt="item">
+        <span>{{ item.name }}</span>
+      </div>
+    </div>
+  </div>
+
+</div>

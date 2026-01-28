@@ -96,3 +96,64 @@
     }
   }
 }
+
+.stats-section {
+  padding: 20px;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); /* 2 Columns */
+  gap: 10px;
+}
+
+.stat-card {
+  background: white;
+  padding: 10px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  border-left: 5px solid #ccc;
+
+  .stat-icon {
+    background: #f4f4f4;
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 10px;
+    font-size: 18px;
+  }
+
+  .stat-info {
+    display: flex;
+    flex-direction: column;
+
+    .stat-label { font-size: 10px; font-weight: bold; color: #888; letter-spacing: 1px; }
+    .stat-value { font-size: 18px; font-weight: 800; color: #333; }
+  }
+
+  /* COLOR CODING */
+  &.str { border-color: #f44336; .stat-icon { color: #f44336; } } /* Red */
+  &.int { border-color: #2196f3; .stat-icon { color: #2196f3; } } /* Blue */
+  &.con { border-color: #4caf50; .stat-icon { color: #4caf50; } } /* Green */
+  &.dex { border-color: #ff9800; .stat-icon { color: #ff9800; } } /* Orange */
+  &.cha { border-color: #9c27b0; .stat-icon { color: #9c27b0; } } /* Purple */
+}
+
+app-raider-customizer {
+  display: block;
+  height: 100%;
+  width: 100%;
+}
+
+/* Optional: If the parent has padding, remove it for the 3D view */
+ion-content {
+  --padding-top: 20px;
+  --padding-bottom: 0;
+  --padding-start: 0;
+  --padding-end: 0;
+}
