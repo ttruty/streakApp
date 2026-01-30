@@ -1,6 +1,6 @@
 {
-  "name": "app",
-  "short_name": "app",
+  "name": "Arc Runners",
+  "short_name": "Arc Runners",
   "display": "standalone",
   "scope": "./",
   "start_url": "./",

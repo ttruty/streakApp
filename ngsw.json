@@ -1,6 +1,6 @@
 {
   "configVersion": 1,
-  "timestamp": 1769793992658,
+  "timestamp": 1769794761347,
   "index": "/streakApp/index.html",
   "assetGroups": [
     {
@@ -349,7 +349,7 @@
     "/streakApp/icons/icon-96x96.png": "7fb8f59c30ce2ff12c700321a0b39e14b3dc8f95",
     "/streakApp/index.html": "da9736b9052e8948072bef7418ef201581f36cf8",
     "/streakApp/main-EOFPA3D6.js": "eeb31f6e590ddbc2e0ae37628161c83a73eb02e2",
-    "/streakApp/manifest.webmanifest": "ea769706c4a59e364d0877b9ef23326f040ace36",
+    "/streakApp/manifest.webmanifest": "c03fdc09750cbd43005487ebb43fa13f1e1474c2",
     "/streakApp/polyfills-TDCRLYKL.js": "454f6db4230cc7ab61b24fe465dcc92bf041737d",
     "/streakApp/styles-JPLKSBAB.css": "5835d22f60a7aa6332b7edd2d9f1e98f16947280"
   },
