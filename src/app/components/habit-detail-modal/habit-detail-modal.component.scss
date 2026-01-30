@@ -1,0 +1,115 @@
+/* --- NAV BAR --- */
+.calendar-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  background: #1e1e1e;
+  border-radius: 12px;
+  padding: 5px;
+
+  .nav-title {
+    font-size: 16px;
+    font-weight: bold;
+    color: white;
+  }
+}
+
+/* --- DAYS HEADER (S M T W...) --- */
+.days-header {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr); /* Exactly 7 columns */
+  gap: 8px;
+  margin-bottom: 8px;
+  text-align: center;
+
+  div {
+    font-size: 12px;
+    font-weight: bold;
+    color: #666;
+  }
+}
+
+/* --- GRID CONTAINER --- */
+.heatmap-container {
+  display: grid;
+  gap: 8px;
+
+  /* Week & Month: 7 Columns (Standard Calendar) */
+  &.week, &.month {
+    grid-template-columns: repeat(7, 1fr);
+  }
+
+  /* Year: 12 Columns (or dense grid) */
+  &.year {
+    grid-template-columns: repeat(auto-fill, minmax(12px, 1fr));
+    gap: 4px;
+  }
+}
+
+/* --- SQUARES --- */
+.heatmap-square {
+  aspect-ratio: 1;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 600;
+  color: #888; /* Default text color */
+  background: #2a2a2a; /* Default (Empty/Future) */
+
+  /* Invisible placeholder for month alignment */
+  &.empty {
+    background: transparent;
+    box-shadow: none;
+  }
+
+  &.completed {
+    background: var(--ion-color-success);
+    color: white;
+    box-shadow: 0 0 10px rgba(45, 211, 111, 0.3);
+  }
+
+  /* Highlight Today */
+  &.today-border {
+    border: 2px solid white;
+  }
+}
+
+.legend {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 24px;
+  margin-top: 30px;
+  margin-bottom: 10px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #aaa;
+}
+
+.dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 4px; /* Slightly rounded to match the grid squares */
+  display: block;
+}
+
+/* Match the Completed/Success color */
+.dot.green {
+  background: var(--ion-color-success);
+  box-shadow: 0 0 6px rgba(45, 211, 111, 0.4);
+}
+
+/* Match the Empty/Default color */
+.dot.grey {
+  background: #2a2a2a;
+  border: 1px solid rgba(255,255,255,0.05);
+}

@@ -4,7 +4,9 @@
   </ion-toolbar>
 </ion-header>
 
+
 <ion-content [fullscreen]="true" class="ion-padding">
+    <app-three-background [effect]="currentEffect"></app-three-background>
 
   <div class="close-container">
     <ion-button routerLink="/tabs/dashboard" fill="clear" size="large">
@@ -17,7 +19,7 @@
     <div class="streak-circle-container">
       <div class="streak-circle">
         <ion-icon name="flame" color="warning"></ion-icon>
-        <h1>{{ currentStreak }}</h1>
+        <h1 style="color: rgb(0, 0, 0);">{{ currentStreak }}</h1>
         <p>DAY STREAK</p>
       </div>
     </div>
@@ -48,6 +50,11 @@
       </div>
     </div>
 
+    <!-- <ion-button (click)="toggleEffect()">
+      Switch Background
+    </ion-button> -->
+
   </div>
+
 
 </ion-content>

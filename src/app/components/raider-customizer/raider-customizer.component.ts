@@ -13,24 +13,7 @@ import {
   closeCircleOutline,
   saveOutline
 } from 'ionicons/icons';
-import { CharacterService } from 'src/app/services/character';
-
-// --- Interfaces for our data ---
-interface GameAsset {
-  id: string;
-  name: string;
-  modelUrl: string;
-  thumbnail: string; // URL to an image
-  scale?: number;     // Optional scale override
-  offset?: [number, number, number]; // Optional position offset
-  rotation?: [number, number, number]; // Optional rotation offset
-}
-
-interface AssetCategory {
-  id: 'base' | 'hat' | 'backpack' | 'item';
-  label: string;
-  icon: string; // Ionic icon name
-}
+import { AssetCategory, CharacterService, GameAsset } from 'src/app/services/character';
 
 @Component({
   selector: 'app-raider-customizer',
@@ -62,25 +45,10 @@ export class RaiderCustomizerComponent implements AfterViewInit, OnDestroy {
     { id: 'item', label: 'Weapon', icon: 'flash' }
   ];
 
-  // MOCK DATA - Replace URLs with your actual assets
-  availableAssets = {
-    base: [
-      { id: 'male_raider', name: 'Male Raider', modelUrl: 'assets/raider_male.glb', thumbnail: 'assets/thumbs/male.png' },
-      { id: 'female_raider', name: 'Female Raider', modelUrl: 'assets/raider_female.glb', thumbnail: 'assets/thumbs/female.png' }
-    ],
-    hat: [
-      { id: 'helmet_sci', name: 'SciFi Helm', modelUrl: 'assets/helmet_sci.glb', thumbnail: 'assets/thumbs/helm.png', scale: 0.15, offset: [0, 21, 0] },
-      { id: 'cowboy', name: 'Cowboy Hat', modelUrl: 'assets/cowboy.glb', thumbnail: 'assets/thumbs/cowboy.png', offset: [0, 0.1, 0] }
-    ],
-    backpack: [
-      { id: 'jetpack', name: 'Jetpack', modelUrl: 'assets/jetpack.glb', thumbnail: 'assets/thumbs/jet.png',scale: 0.5, offset: [0, 0, 0] },
-      { id: 'rucksack', name: 'Survival Bag', modelUrl: 'assets/rucksack.glb', thumbnail: 'assets/thumbs/bag.png', scale: 0.5, offset: [0, 0, 0] }
-    ],
-    item: [
-      { id: 'rifle', name: 'Plasma Rifle', modelUrl: 'assets/rifle.glb', thumbnail: 'assets/thumbs/rifle.png', scale: .01, offset: [0, 0, 0] },
-      { id: 'sword', name: 'Katana', modelUrl: 'assets/sword.glb', thumbnail: 'assets/thumbs/katana.png', scale: .01, offset: [0, 0, 0] }
-    ]
-  };
+  //90° = 1.57 (Math.PI / 2)
+// 180° = 3.14 (Math.PI)
+// 270° = 4.71 (3 * Math.PI / 2)
+// 360° = 6.28 (2 * Math.PI)
 
   // --- Three.js Variables ---
   renderer!: THREE.WebGLRenderer;
@@ -88,6 +56,11 @@ export class RaiderCustomizerComponent implements AfterViewInit, OnDestroy {
   camera!: THREE.PerspectiveCamera;
   mixer!: THREE.AnimationMixer;
   clock = new THREE.Clock();
+
+  // --- DRAG ROTATION STATE ---
+  isDragging = false;
+  previousMouseX = 0;
+  rotationSpeed = 0.005; // Adjust sensitivity here
 
   // The Main Character Model Group
   characterModel: THREE.Object3D | null = null;
@@ -116,8 +89,9 @@ export class RaiderCustomizerComponent implements AfterViewInit, OnDestroy {
   // FIX: Wrap this in setTimeout to avoid ExpressionChangedAfterItHasBeenCheckedError
   setTimeout(() => {
     // Load default character
-    this.selectOption(this.availableAssets.base[0]);
+    this.restoreSession();
   }, 0);
+
 }
 
   ngOnDestroy() {
@@ -131,7 +105,7 @@ export class RaiderCustomizerComponent implements AfterViewInit, OnDestroy {
   }
 
   getOptionsForCategory() {
-    return this.availableAssets[this.selectedCategory];
+    return this.charService.ASSET_LIBRARY[this.selectedCategory];
   }
 
   isEquipped(item: GameAsset) {
@@ -174,6 +148,46 @@ export class RaiderCustomizerComponent implements AfterViewInit, OnDestroy {
     // TODO: Send to your backend
   }
 
+  // Mouse Events
+  onStart(event: MouseEvent) {
+    this.isDragging = true;
+    this.previousMouseX = event.clientX;
+  }
+
+  onMove(event: MouseEvent) {
+    this.handleInput(event.clientX);
+  }
+
+  // Touch Events
+  onTouchStart(event: TouchEvent) {
+    this.isDragging = true;
+    this.previousMouseX = event.touches[0].clientX;
+  }
+
+  onTouchMove(event: TouchEvent) {
+    // Prevent scrolling while rotating character
+    // event.preventDefault();
+    this.handleInput(event.touches[0].clientX);
+  }
+
+  onEnd() {
+    this.isDragging = false;
+  }
+
+  // Shared Logic
+  handleInput(currentX: number) {
+    if (!this.isDragging || !this.characterModel) return;
+
+    const deltaX = currentX - this.previousMouseX;
+
+    // Rotate model
+    this.characterModel.rotation.y += deltaX * this.rotationSpeed;
+
+    // Update previous position for next frame
+    this.previousMouseX = currentX;
+  }
+
+
   // --- Three.js Logic ---
 
   initThree() {
@@ -184,7 +198,7 @@ export class RaiderCustomizerComponent implements AfterViewInit, OnDestroy {
     this.scene = new THREE.Scene();
     this.scene.background = new THREE.Color(0x222222);
 
-    this.camera = new THREE.PerspectiveCamera(50, width / height, 0.1, 1000);
+    this.camera = new THREE.PerspectiveCamera(30, width / height, 0.1, 1000);
     this.camera.position.set(0, 0, 4); // Adjusted for character height
 
     this.renderer = new THREE.WebGLRenderer({ canvas: this.rendererCanvas.nativeElement, antialias: true, alpha: true });
@@ -267,7 +281,7 @@ export class RaiderCustomizerComponent implements AfterViewInit, OnDestroy {
     // !!! CHECK YOUR GLB BONE NAMES !!!
     let boneName = '';
     if (type === 'hat') boneName = 'mixamorigHead';
-    if (type === 'backpack') boneName = 'mixamorigHead'; // Upper spine
+    if (type === 'backpack') boneName = 'mixamorigSpine2'; // Upper spine
     if (type === 'item') boneName = 'mixamorigRightHand';
 
     const bone = this.characterModel.getObjectByName(boneName);
@@ -282,20 +296,36 @@ export class RaiderCustomizerComponent implements AfterViewInit, OnDestroy {
     // 3. Load the new accessory
     const loader = new GLTFLoader();
     loader.load(asset.modelUrl, (gltf) => {
-      const mesh = gltf.scene;
+      const root = gltf.scene;
+      // A. Traverse to fix Materials and identify Scaling issues
+      root.traverse((child: any) => {
+        if (child.isMesh) {
+          // 1. Ensure it renders on both sides (fixes "inside-out" invisibility)
+          if (child.material) {
+            child.material.side = THREE.DoubleSide;
+          }
+          // 2. Enable Shadows
+          child.castShadow = true;
+          child.receiveShadow = true;
+        }
+      });
 
-      // Apply asset-specific tweaks
-      if (asset.scale) mesh.scale.setScalar(asset.scale);
-      if (asset.offset) mesh.position.set(...asset.offset);
-      if (asset.rotation) mesh.rotation.set(...asset.rotation);
+      // B. Apply Config Configs (Scale/Rotation)
+      // Backpacks often need to be rotated 180 degrees (Math.PI) to face backward
+      if (asset.scale) root.scale.setScalar(asset.scale);
+      if (asset.rotation) root.rotation.set(...asset.rotation);
+      if (asset.offset) root.position.set(...asset.offset);
 
-      console.log('Accessory Mesh:', mesh);
+      // C. Debug Helper: If you still can't see it, uncomment this!
+      // const box = new THREE.Box3().setFromObject(root);
+      // const helper = new THREE.Box3Helper(box, 0xffff00); // Yellow Box
+      // root.add(helper);
+      // console.log(`Loaded ${type} size:`, box.getSize(new THREE.Vector3()));
 
-      // Attach to bone
-      bone.add(mesh);
+      // --- FIX ENDS HERE ---
 
-      // Save reference so we can remove it later
-      this.accessoryObjects[type] = mesh;
+      bone.add(root);
+      this.accessoryObjects[type] = root;
     });
   }
 
@@ -307,32 +337,54 @@ export class RaiderCustomizerComponent implements AfterViewInit, OnDestroy {
   }
 
   restoreSession() {
+    // 1. Get saved data from Service
     const saved = this.charService.getLoadout();
 
-    // 1. Restore Base Model
-    // We look for the asset object that matches the saved URL
-    const baseAsset = this.availableAssets.base.find(a => a.modelUrl === saved.baseModel);
+    // 2. Resolve the Full Asset Objects
+    // We need to look up the full object (with scale/offset) using the saved ID/URL
+    // Note: Use 'this.charService.ASSET_LIBRARY' if you moved assets there,
+    // otherwise use 'this.availableAssets' if they are still local.
+    const library = (this.charService as any).ASSET_LIBRARY;
 
-    // If we found a match, load it. Otherwise default to the first one.
-    if (baseAsset) {
-      this.changeBaseModel(baseAsset);
-    } else {
-      this.changeBaseModel(this.availableAssets.base[0]);
+    const baseAsset = this.findAsset(library.base, saved?.base);
+    const hatAsset = this.findAsset(library.hat, saved?.hat);
+    const backpackAsset = this.findAsset(library.backpack, saved?.backpack);
+    const itemAsset = this.findAsset(library.item, saved?.item);
+
+    // 3. Fallback to Default Male if no save exists
+    if (!baseAsset) {
+      console.log('No save found, loading default.');
+      this.selectOption(library.base[0]);
+      return;
     }
 
-    // 2. Restore Accessories
-    // We pass the URL from the saved data to a helper to find the Asset Object
-    if (saved.hat) this.restoreAccessory('hat', saved.hat);
-    if (saved.backpack) this.restoreAccessory('backpack', saved.backpack);
-    if (saved.item) this.restoreAccessory('item', saved.item);
+    console.log('Restoring Session:', { baseAsset, hatAsset, backpackAsset, itemAsset });
+
+    // 4. PRE-SET the Loadout State
+    // We set these NOW so that when the base model finishes loading,
+    // it sees these items waiting and attaches them automatically.
+    this.currentLoadout = {
+      base: baseAsset,
+      hat: hatAsset || null,
+      backpack: backpackAsset || null,
+      item: itemAsset || null
+    };
+
+    // 5. Trigger the Chain Reaction
+    // Loading the base model will trigger step 4 in your changeBaseModel() function
+    this.changeBaseModel(baseAsset);
   }
 
-  private restoreAccessory(category: 'hat' | 'backpack' | 'item', url: string) {
-    // Find the full Asset Object (with scale/offset info) that matches the saved URL
-    const asset = this.availableAssets[category].find(a => a.modelUrl === url);
+  // Helper to match saved data (which might be a string URL or an object) to the real asset
+  private findAsset(categoryList: GameAsset[], savedItem: any): GameAsset | null {
+    if (!savedItem) return null;
 
-    if (asset) {
-      // this.changeAccessory(category, asset);
+    // If savedItem is just a string (URL or ID)
+    if (typeof savedItem === 'string') {
+      return categoryList.find(a => a.id === savedItem || a.modelUrl === savedItem) || null;
     }
+
+    // If savedItem is the object itself
+    return categoryList.find(a => a.id === savedItem.id) || null;
   }
 }

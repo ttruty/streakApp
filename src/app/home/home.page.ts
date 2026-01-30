@@ -8,6 +8,7 @@ import {
 import { addIcons } from 'ionicons';
 import { flame, checkmarkCircle, ellipseOutline, closeCircleOutline } from 'ionicons/icons';
 import { DayStatus, StreakService } from '../services/streak';
+import { ThreeBackgroundComponent } from '../components/three-background/three-background.component';
 
 @Component({
   selector: 'app-home',
@@ -22,7 +23,8 @@ import { DayStatus, StreakService } from '../services/streak';
     IonTitle,
     IonContent,
     IonIcon,
-    IonButton   // <--- Added to imports array
+    IonButton,  // <--- Added to imports array
+    ThreeBackgroundComponent,
   ]
 })
 export class HomePage {
@@ -32,6 +34,12 @@ export class HomePage {
   constructor(private streakService: StreakService) {
     // Register the icons
     addIcons({ flame, checkmarkCircle, ellipseOutline, closeCircleOutline });
+  }
+
+  currentEffect: 'stars' | 'grid' = 'stars';
+
+  toggleEffect() {
+    this.currentEffect = this.currentEffect === 'stars' ? 'grid' : 'stars';
   }
 
   ionViewWillEnter() {

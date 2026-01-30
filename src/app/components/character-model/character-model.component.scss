@@ -1,14 +1,14 @@
 .character-section {
   flex: 1;
-  height: 50vh;
+  height: 30vh;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(to bottom, #e0f7fa, #000000);
+  background: linear-gradient(to bottom, #4b4b4b, #000000);
   position: relative;
   overflow: hidden; // Keeps the canvas contained
-  min-height: 40vh;
+  min-height: 30vh;
 
   .three-canvas {
     width: 100%;

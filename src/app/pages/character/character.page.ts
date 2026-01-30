@@ -73,6 +73,7 @@ export class CharacterPage implements OnInit, ViewDidEnter { // <--- Add impleme
   // FIX: Load data immediately when Angular creates the component
   ngOnInit() {
     this.refresh();
+    this.charService.loadRaiderFromStorage();
   }
 
   // Keep this to refresh data when you tab back to the page

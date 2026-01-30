@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, ViewChild, AfterViewInit, OnDestroy, effect } from '@angular/core';
 import { CharacterService } from 'src/app/services/character';
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
@@ -10,132 +10,213 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
   standalone: true,
   imports: []
 })
-export class CharacterModelComponent {
+export class CharacterModelComponent implements AfterViewInit, OnDestroy {
 
   @ViewChild('rendererCanvas', { static: false }) rendererCanvas!: ElementRef;
 
-  // Three.js variables
   renderer!: THREE.WebGLRenderer;
   scene!: THREE.Scene;
   camera!: THREE.PerspectiveCamera;
   mixer!: THREE.AnimationMixer;
   clock = new THREE.Clock();
+  model!: THREE.Object3D;
   animationId: number = 0;
   spinSpeed: number = 0;
-  model!: THREE.Object3D;
 
-  constructor(public charService: CharacterService) { }
+  // --- DRAG ROTATION STATE ---
+  isDragging = false;
+  previousMouseX = 0;
+  rotationSpeed = 0.005; // Adjust sensitivity here
+
+  currentEffect: 'stars' | 'grid' = 'stars';
+
+  toggleEffect() {
+    this.currentEffect = this.currentEffect === 'stars' ? 'grid' : 'stars';
+  }
+
+  constructor(public charService: CharacterService) {
+    effect(() => {
+      // access the signal (this creates the dependency)
+      const currentData = this.charService.loadout();
+
+      // Only try to load if ThreeJS is already running
+      if (this.scene) {
+        console.log('Signal detected change! Reloading...');
+        this.loadCustomCharacter(currentData);
+      }
+    });
+  }
 
   ngAfterViewInit() {
     this.initThree();
   }
-
-  ngOnEnter() {
-    // Reload character when entering view
-    this.loadCustomCharacter();
-  }
-
 
   ngOnDestroy() {
     if (this.animationId) cancelAnimationFrame(this.animationId);
     if (this.renderer) this.renderer.dispose();
   }
 
-  onCharacterTouch() {
-    this.spinSpeed = 0.5;
+  // Mouse Events
+  onStart(event: MouseEvent) {
+    this.isDragging = true;
+    this.previousMouseX = event.clientX;
+  }
+
+  onMove(event: MouseEvent) {
+    this.handleInput(event.clientX);
+  }
+
+  // Touch Events
+  onTouchStart(event: TouchEvent) {
+    this.isDragging = true;
+    this.previousMouseX = event.touches[0].clientX;
+  }
+
+  onTouchMove(event: TouchEvent) {
+    // Prevent scrolling while rotating character
+    // event.preventDefault();
+    this.handleInput(event.touches[0].clientX);
+  }
+
+  onEnd() {
+    this.isDragging = false;
+  }
+
+  // Shared Logic
+  handleInput(currentX: number) {
+    if (!this.isDragging || !this.model) return;
+
+    const deltaX = currentX - this.previousMouseX;
+
+    // Rotate model
+    this.model.rotation.y += deltaX * this.rotationSpeed;
+
+    // Update previous position for next frame
+    this.previousMouseX = currentX;
   }
 
   initThree() {
-    // 1. Setup Canvas
+    // 1. Setup Canvas (Standard ThreeJS Boilerplate)
     const container = this.rendererCanvas.nativeElement.parentElement;
-    const width = container.clientWidth;
-    const height = container.clientHeight;
+    const width = container.clientWidth || 300; // Fallback width
+    const height = container.clientHeight || 400;
 
-    if (width === 0 || height === 0) {
-      setTimeout(() => this.initThree(), 100);
-      return;
-    }
-
-    // 2. Setup Scene & Camera
     this.scene = new THREE.Scene();
-    this.scene.background = new THREE.Color(0x333333);
+    // Transparent background so CSS gradient shows through
+    // this.scene.background = null;
 
-    this.camera = new THREE.PerspectiveCamera(50, width / height, 0.1, 1000);
-    this.camera.position.set(0, 0, 4); // Adjusted camera to look at torso
+    this.camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
+    this.camera.position.set(0, -0.25, 4); // Look at center
 
     this.renderer = new THREE.WebGLRenderer({
       canvas: this.rendererCanvas.nativeElement,
-      antialias: true
+      antialias: true,
+      alpha: true // Important for transparency
     });
     this.renderer.setSize(width, height);
 
-    // 3. Lights
-    const light = new THREE.DirectionalLight(0xffffff, 2);
-    light.position.set(2, 2, 5);
-    this.scene.add(light);
-    this.scene.add(new THREE.AmbientLight(0xffffff, 0.5));
+    // Lights
+    const hemiLight = new THREE.HemisphereLight(0xffffff, 0x444444, 1.2);
+    hemiLight.position.set(0, 20, 0);
+    this.scene.add(hemiLight);
 
-    // 4. LOAD THE CUSTOMIZED CHARACTER
+    const dirLight = new THREE.DirectionalLight(0xffffff, 1.5);
+    dirLight.position.set(3, 10, 10);
+    this.scene.add(dirLight);
+
+    // LOAD
     this.loadCustomCharacter();
 
-    // 5. Start Loop
+    // Loop
     this.animate();
   }
 
-  loadCustomCharacter() {
-    //if model exists, remove it
-    if (this.model) {
-      this.scene.remove(this.model);
+loadCustomCharacter(signalData: any = null) {
+    if (this.model) this.scene.remove(this.model);
+
+
+    // 1. Get Saved Data
+    let loadout = signalData || this.charService.loadRaiderFromStorage();
+    // 2. Fallback Default
+    if (!loadout || !loadout.base) {
+      loadout = {
+        base: this.charService.ASSET_LIBRARY.base[0], // Default Male
+        hat: null,
+        backpack: null,
+        item: null
+      };
     }
-    const loadout = this.charService.getLoadout();
-    console.log('Loading Character with Loadout:', loadout);
+
+    // 3. Resolve Base Model URL
+    // The save might be an object OR just a URL string.
+    // We use the helper to get the full GameAsset object.
+    const baseAsset = this.charService.getAssetDetails('base', loadout.base);
+
+    if (!baseAsset) {
+        console.error("Could not resolve base model"); return;
+    }
+
     const loader = new GLTFLoader();
 
-    // A. Load the Base Model first
-    loader.load(loadout.baseModel!, (gltf) => {
+    loader.load(baseAsset.modelUrl, (gltf) => {
       this.model = gltf.scene;
-
-      // Reset position/scale
       this.model.scale.set(1, 1, 1);
       this.model.position.set(0, -1, 0);
       this.scene.add(this.model);
 
-      // Setup Animation
+      // Animation
       if (gltf.animations.length > 0) {
-        this.mixer = new THREE.AnimationMixer(gltf.scene);
-        const action = this.mixer.clipAction(gltf.animations[0]);
-        action.play();
+        this.mixer = new THREE.AnimationMixer(this.model);
+        this.mixer.clipAction(gltf.animations[0]).play();
       }
 
-      // B. Load Accessories (now that the base skeleton exists)
-      if (loadout.hat) this.attachAccessory(loadout.hat, 'mixamorigHead');
-      if (loadout.backpack) this.attachAccessory(loadout.backpack, 'mixamorigSpine2');
-      if (loadout.item) this.attachAccessory(loadout.item, 'mixamorigRightHand');
+      // 4. Attach Accessories using the "Smart" Helper
+      if (loadout.hat) this.attachSmartAccessory('hat', loadout.hat, 'mixamorigHead');
+      if (loadout.backpack) this.attachSmartAccessory('backpack', loadout.backpack, 'mixamorigSpine2');
+      if (loadout.item) this.attachSmartAccessory('item', loadout.item, 'mixamorigRightHand');
 
-    }, undefined, (err) => console.error('Error loading base model:', err));
+    });
   }
 
   /**
-   * Helper to load an accessory and stick it to a bone
+   * Looks up the asset config (scale, offset) and attaches it correctly
    */
-  attachAccessory(url: string, boneName: string) {
-    const loader = new GLTFLoader();
+  attachSmartAccessory(category: string, identifier: any, boneName: string) {
+    // 1. Find the full configuration from the Service
+    const asset = this.charService.getAssetDetails(category, identifier);
 
-    // Find the bone on the currently loaded model
+    if (!asset) return;
+
+    // 2. Find Bone
     const bone = this.model.getObjectByName(boneName);
+    if (!bone) return;
 
-    if (!bone) {
-      console.warn(`Could not find bone: ${boneName}`);
-      return;
-    }
+    // 3. Load & Transform
+    const loader = new GLTFLoader();
+    loader.load(asset.modelUrl, (gltf) => {
+      const root = gltf.scene;
 
-    loader.load(url, (gltf) => {
-      const accessory = gltf.scene;
+      // --- APPLY CONFIGS (The key part!) ---
+      // Fix Materials
+      root.traverse((child: any) => {
+        if (child.isMesh) {
+          child.castShadow = true;
+          child.receiveShadow = true;
+          if (child.material) child.material.side = THREE.DoubleSide;
+        }
+      });
 
-      // Optional: Add manual offsets here if needed
-      // accessory.position.set(0, 0.1, 0);
+      // Apply Scale
+      if (asset.scale) root.scale.setScalar(asset.scale);
 
-      bone.add(accessory);
+      // Apply Rotation
+      if (asset.rotation) root.rotation.set(...asset.rotation);
+
+      // Apply Offset
+      if (asset.offset) root.position.set(...asset.offset);
+
+      // Attach
+      bone.add(root);
     });
   }
 
@@ -144,7 +225,7 @@ export class CharacterModelComponent {
     const delta = this.clock.getDelta();
     if (this.mixer) this.mixer.update(delta);
 
-    // Spin Logic
+    // Spin Effect
     if (this.model && this.spinSpeed > 0.001) {
       this.model.rotation.y += this.spinSpeed;
       this.spinSpeed *= 0.95;

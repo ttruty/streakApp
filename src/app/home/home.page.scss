@@ -85,6 +85,12 @@
   }
 }
 
+.streak-text {
+  color: var(--ion-color-warning);
+  font-size: 80px;
+  font-weight: 800;
+  margin: 0;
+}
 // Highlight today's column slightly
 .day-column.today {
   .day-label {

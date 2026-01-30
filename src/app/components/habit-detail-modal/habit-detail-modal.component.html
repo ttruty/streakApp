@@ -1,0 +1,54 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>{{ habit.title }}</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="close()">Close</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+
+  <ion-segment [value]="segmentValue" (ionChange)="segmentChanged($event)" mode="ios" class="ion-margin-bottom">
+    <ion-segment-button value="week"><ion-label>Week</ion-label></ion-segment-button>
+    <ion-segment-button value="month"><ion-label>Month</ion-label></ion-segment-button>
+    <ion-segment-button value="year"><ion-label>Year</ion-label></ion-segment-button>
+  </ion-segment>
+
+  <div class="calendar-nav">
+    <ion-button fill="clear" (click)="changeDate(-1)">
+      <ion-icon name="chevron-back"></ion-icon>
+    </ion-button>
+
+    <div class="nav-title">{{ viewTitle }}</div>
+
+    <ion-button fill="clear" (click)="changeDate(1)">
+      <ion-icon name="chevron-forward"></ion-icon>
+    </ion-button>
+  </div>
+
+  <div class="days-header" *ngIf="segmentValue !== 'year'">
+    <div *ngFor="let d of weekDays">{{ d }}</div>
+  </div>
+
+  <div class="heatmap-container" [ngClass]="segmentValue">
+
+    <div *ngFor="let day of gridSquares"
+         class="heatmap-square"
+         [class.empty]="day.isEmpty"
+         [class.completed]="day.status === 'completed'"
+         [class.missed]="!day.isEmpty && day.status === 'missed'"
+         [class.today-border]="day.isToday">
+
+      <span>{{ day.label }}</span>
+
+    </div>
+
+  </div>
+
+  <div class="legend">
+    <div class="legend-item"><span class="dot green"></span> Done</div>
+    <div class="legend-item"><span class="dot grey"></span> Empty</div>
+  </div>
+
+</ion-content>

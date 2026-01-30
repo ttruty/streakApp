@@ -1,5 +1,15 @@
 <div class="character-section">
-  <canvas #rendererCanvas class="three-canvas" (click)="onCharacterTouch()"></canvas>
+  <!-- <app-three-background [effect]="currentEffect"></app-three-background> -->
+
+  <canvas #rendererCanvas class="three-canvas"
+  (mousedown)="onStart($event)"
+  (mousemove)="onMove($event)"
+  (mouseup)="onEnd()"
+  (mouseleave)="onEnd()"
+  (touchstart)="onTouchStart($event)"
+  (touchmove)="onTouchMove($event)"
+  (touchend)="onEnd()">
+</canvas>
   <div class="level-badge">Level {{ charService.state.level }}</div>
   <div class="xp-badge">{{ charService.state.currentXp }} / {{ charService.state.maxXp }} XP</div>
 </div>

@@ -15,7 +15,8 @@
 <ion-content [fullscreen]="true" scrollY="false">
   <div class="split-layout">
 
-    <app-character-model></app-character-model>
+    <app-character-model>
+    </app-character-model>
 
     <div class="habits-section">
       <h3>Today's Quests</h3>
@@ -29,24 +30,28 @@
             [class.rarity-high]="habit.reward === 'high'"
             >
 
+
+
             <ion-checkbox slot="start" [checked]="habit.completed"
-              (ionChange)="onToggleHabit($event, habit)"></ion-checkbox>
+            (ionChange)="onToggleHabit($event, habit)"></ion-checkbox>
 
             <div class="habit-icon-circle" slot="start">
               <ion-icon [name]="habit.icon"></ion-icon>
             </div>
 
+            <div class="content-wrapper" (click)="openHabitDetail(habit)" style="flex: 1; display: flex; align-items: center;">
             <ion-label>
-              <h2>{{ habit.title }}</h2>
-              <div class="streak-chip">
-                <ion-icon name="flame"></ion-icon>
-                <span>{{ habit.streak }} Days</span>
-              </div>
-             </ion-label>
+                <h2>{{ habit.title }}</h2>
+                <div class="streak-chip">
+                  <ion-icon name="flame"></ion-icon>
+                  <span>{{ habit.streak }} Days</span>
+                </div>
+              </ion-label>
+            </div>
 
-             <div class="stat-chip" [ngClass]="habit.associatedStat">
-                  <ion-icon [name]="getStatIcon(habit.associatedStat)"></ion-icon>
-                  <span>{{ (habit.associatedStat) }}</span>
+              <div class="stat-chip" [ngClass]="habit.associatedStat">
+                <ion-icon [name]="getStatIcon(habit.associatedStat)"></ion-icon>
+                <span>{{ (habit.associatedStat) }}</span>
               </div>
           </ion-item>
 

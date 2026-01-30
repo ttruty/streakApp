@@ -31,6 +31,7 @@ import {
 import { CompletionModalComponent } from '../../components/completion-modal/completion-modal.component';
 import { CharacterService } from 'src/app/services/character';
 import { CharacterModelComponent } from 'src/app/components/character-model/character-model.component';
+import { HabitDetailModalComponent } from 'src/app/components/habit-detail-modal/habit-detail-modal.component';
 
 @Component({
   selector: 'app-dashboard',
@@ -56,7 +57,7 @@ export class DashboardPage {
     private toastCtrl: ToastController,
     private inventoryService: InventoryService,
     private alertCtrl: AlertController,
-    public charService: CharacterService
+    public charService: CharacterService,
   ) {
     addIcons({ settingsOutline });
     addIcons({
@@ -72,8 +73,8 @@ export class DashboardPage {
   }
 
   ionViewDidEnter() {
+    this.habitService.checkDateAndReset();
     this.habits = this.habitService.getHabits();
-    // Re-initialize 3D logic if needed here or keep separate
   }
 
   // rewardsPool: Item[] = [
@@ -119,6 +120,14 @@ export class DashboardPage {
       });
       toast.present();
     }
+  }
+
+  async openHabitDetail(habit: Habit) {
+    const modal = await this.modalCtrl.create({
+      component: HabitDetailModalComponent,
+      componentProps: { habit: habit }
+    });
+    return await modal.present();
   }
 
 

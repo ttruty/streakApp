@@ -10,7 +10,15 @@
     </div>
 
     <div class="canvas-wrapper">
-      <canvas #rendererCanvas (touchstart)="onCharacterTouch()"></canvas>
+      <canvas #rendererCanvas
+      (mousedown)="onStart($event)"
+      (mousemove)="onMove($event)"
+      (mouseup)="onEnd()"
+      (mouseleave)="onEnd()"
+      (touchstart)="onTouchStart($event)"
+      (touchmove)="onTouchMove($event)"
+      (touchend)="onEnd()">
+      </canvas>
 
       <div *ngIf="isLoading" class="loading-overlay">
         <ion-spinner name="crescent"></ion-spinner>

@@ -28,6 +28,7 @@ export interface HabitLog {
 })
 export class HabitService {
   private STORAGE_KEY = 'user_habits';
+  private DATE_KEY = 'last_habit_date'; // <--- NEW KEY
 
   constructor() { }
 
@@ -113,5 +114,53 @@ export class HabitService {
       // Optionally remove last history entry
       this.updateHabits(habits);
     }
+  }
+
+  checkDateAndReset() {
+    const todayStr = new Date().toDateString(); // e.g., "Fri Jan 30 2026"
+    const lastDateStr = localStorage.getItem(this.DATE_KEY);
+
+    // If it's the same day, do nothing
+    if (lastDateStr === todayStr) {
+      return;
+    }
+
+    // IT IS A NEW DAY!
+    console.log('New Day Detected! Resetting habits...');
+
+    const habits = this.getHabits();
+    const wasYesterday = this.isYesterday(lastDateStr);
+
+    habits.forEach(habit => {
+      // 1. Handle Streaks
+      if (habit.frequency === 'daily') {
+        if (habit.completed && wasYesterday) {
+           // They did it yesterday! Streak continues.
+           // (We don't change streak number here, it stays high)
+        } else if (!habit.completed) {
+           // They missed it yesterday (or longer)! Reset streak.
+           habit.streak = 0;
+        }
+        // Note: If they opened the app after a week, 'wasYesterday' is false,
+        // so streaks automatically reset to 0. Correct.
+      }
+
+      // 2. Reset Completion for the new day
+      habit.completed = false;
+    });
+
+    // 3. Save everything
+    this.updateHabits(habits);
+    localStorage.setItem(this.DATE_KEY, todayStr);
+  }
+
+  // Helper to check if the date string was exactly yesterday
+  private isYesterday(dateStr: string | null): boolean {
+    if (!dateStr) return false;
+
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+
+    return yesterday.toDateString() === dateStr;
   }
 }
