@@ -1,4 +1,8 @@
 import { Injectable, signal, WritableSignal } from '@angular/core';
+import { RewardModalComponent } from '../components/reward-modal/reward-modal.component';
+import { InventoryService } from './inventory';
+import { ToastController } from '@ionic/angular/standalone';
+import { ModalController } from '@ionic/angular/standalone';
 
 // --- Interfaces for our data ---
 export interface GameAsset {
@@ -22,19 +26,6 @@ export interface Loadout {
   hat?: string;       // URL to hat GLB
   backpack?: string;  // URL to backpack GLB
   item?: string;      // URL to item GLB
-}
-
-export interface Achievement {
-  id: string;
-  title: string;
-  description: string;
-  type: 'streak' | 'count' | 'collection'; // What does it track?
-  targetId?: string; // e.g., 'hammer' for collection
-  targetValue: number; // e.g., 5 days, 10 quests
-  currentValue: number;
-  xpReward: number;
-  completed: boolean;
-  claimed: boolean; // Has user clicked "Claim"?
 }
 
 export interface CharacterStats {
@@ -186,26 +177,6 @@ export class CharacterService {
   private STORAGE_KEY = 'user_character_v1';
   private RAIDER_STORAGE_KEY = 'raider_loadout';
 
-  // 1. The Master List of Possible Achievements
-  // You can easily add more here later!
-  private MASTER_ACHIEVEMENTS: Achievement[] = [
-    {
-      id: 'streak_3', title: 'Consistency is Key', description: 'Reach a 3-day streak on any habit',
-      type: 'streak', targetValue: 3, currentValue: 0, xpReward: 50, completed: false, claimed: false
-    },
-    {
-      id: 'streak_7', title: 'Unstoppable', description: 'Reach a 7-day streak on any habit',
-      type: 'streak', targetValue: 7, currentValue: 0, xpReward: 150, completed: false, claimed: false
-    },
-    {
-      id: 'quest_10', title: 'Busy Bee', description: 'Complete 10 total quests',
-      type: 'count', targetValue: 10, currentValue: 0, xpReward: 100, completed: false, claimed: false
-    },
-    {
-      id: 'collector_hammer', title: 'Hammer Time', description: 'Collect 3 Hammers',
-      type: 'collection', targetId: 'hammer', targetValue: 3, currentValue: 0, xpReward: 200, completed: false, claimed: false
-    }
-  ];
 
  state: CharacterState = {
     level: 1,
@@ -220,9 +191,11 @@ export class CharacterService {
     }
   };
 
-  achievements: Achievement[] = [];
-
-  constructor() {
+  constructor(
+        private modalCtrl: ModalController,
+        private toastCtrl: ToastController,
+        private inventoryService: InventoryService,
+  ) {
     this.loadData();
   }
 
@@ -274,17 +247,8 @@ export class CharacterService {
     if (data) {
       const parsed = JSON.parse(data);
       this.state = parsed.state;
-      this.achievements = parsed.achievements;
-
-      // Merge new master achievements if they don't exist yet
-      this.MASTER_ACHIEVEMENTS.forEach(master => {
-        if (!this.achievements.find(a => a.id === master.id)) {
-          this.achievements.push(master);
-        }
-      });
     } else {
       // First time setup
-      this.achievements = [...this.MASTER_ACHIEVEMENTS];
       this.saveData();
     }
   }
@@ -292,7 +256,6 @@ export class CharacterService {
   private saveData() {
     localStorage.setItem(this.STORAGE_KEY, JSON.stringify({
       state: this.state,
-      achievements: this.achievements
     }));
   }
 
@@ -313,50 +276,42 @@ export class CharacterService {
     }
   }
 
-  // --- EVENT LISTENERS (Call these from other services) ---
+    async openReward() {
+      // 1. Generate 1 to 5 random items from the inventory system
+      const randomLoot = this.inventoryService.getRandomItems(1, 5);
 
-  // Call this when a habit is completed
-  notifyHabitComplete(streak: number) {
-    // 1. Update 'count' achievements
-    this.achievements.filter(a => a.type === 'count' && !a.completed).forEach(a => {
-      a.currentValue++;
-      if (a.currentValue >= a.targetValue) a.completed = true;
-    });
+      console.log('Generated Loot Pool:', randomLoot);
 
-    // 2. Update 'streak' achievements (Only update if this streak is higher)
-    this.achievements.filter(a => a.type === 'streak' && !a.completed).forEach(a => {
-      if (streak > a.currentValue) {
-        a.currentValue = streak;
-        if (a.currentValue >= a.targetValue) a.completed = true;
+      const modal = await this.modalCtrl.create({
+        component: RewardModalComponent,
+        componentProps: {
+          // Pass the dynamic list instead of the hardcoded rewardsPool
+          possibleRewards: randomLoot
+        },
+        cssClass: 'my-custom-modal-css',
+        backdropDismiss: false
+      });
+
+      await modal.present();
+
+      const { data } = await modal.onDidDismiss();
+
+      // 3. Handle Collection (actually add to inventory)
+      if (data?.claimed && data?.reward) {
+        console.log('User collected:', data.reward);
+
+        // If the modal returns a specific chosen item, add it:
+        this.inventoryService.addItem(data.reward);
+
+        const toast = await this.toastCtrl.create({
+          message: `Collected ${data.reward.name}!`,
+          duration: 2000,
+          color: 'success',
+          position: 'top'
+        });
+        toast.present();
       }
-    });
-
-    this.saveData();
-  }
-
-  // Call this when inventory changes
-  notifyInventoryUpdate(items: any[]) {
-    this.achievements.filter(a => a.type === 'collection' && !a.completed).forEach(a => {
-      const found = items.find(i => i.id === a.targetId);
-      if (found) {
-        a.currentValue = found.quantity;
-        if (a.currentValue >= a.targetValue) a.completed = true;
-      }
-    });
-    this.saveData();
-  }
-
-  // --- UI ACTIONS ---
-  claimAchievement(id: string) {
-    const ach = this.achievements.find(a => a.id === id);
-    if (ach && ach.completed && !ach.claimed) {
-      ach.claimed = true;
-      this.addXp(ach.xpReward);
-      this.saveData();
-      return ach.xpReward;
     }
-    return 0;
-  }
 
   // Call this when habit is done (isPenalty = false) or missed (isPenalty = true)
   modifyStat(stat: keyof CharacterStats, difficulty: 'easy' | 'medium' | 'hard', isPenalty: boolean = false) {

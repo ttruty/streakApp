@@ -8,9 +8,10 @@ import {
 import { addIcons } from 'ionicons';
 import { checkmarkCircle, barbell, book, heart, flash, chatbubble } from 'ionicons/icons';
 import { ViewDidEnter } from '@ionic/angular/standalone';
-import { Achievement, CharacterService, CharacterState } from 'src/app/services/character';
+import { CharacterService, CharacterState } from 'src/app/services/character';
 import { FormsModule } from '@angular/forms';
 import { RaiderCustomizerComponent } from 'src/app/components/raider-customizer/raider-customizer.component';
+import { Achievement, AchievementService } from 'src/app/services/achievement';
 
 @Component({
   selector: 'app-character',
@@ -61,11 +62,14 @@ export class CharacterPage implements OnInit, ViewDidEnter { // <--- Add impleme
   };
 
   achievements: Achievement[] = [];
+  activeQuests: Achievement[] = [];
+  trophyCase: Achievement[] = [];
 
   constructor(
     private charService: CharacterService,
     private toastCtrl: ToastController,
-    private alertCtrl: AlertController
+    private alertCtrl: AlertController,
+    private achievementService: AchievementService
   ) {
     addIcons({barbell,book,heart,flash,chatbubble,checkmarkCircle});
   }
@@ -79,18 +83,24 @@ export class CharacterPage implements OnInit, ViewDidEnter { // <--- Add impleme
   // Keep this to refresh data when you tab back to the page
   ionViewDidEnter() {
     this.refresh();
+    this.refreshView();
   }
 
   refresh() {
     // Safety check: ensure service actually has data
     if (this.charService.state) {
       this.state = this.charService.state;
-      this.achievements = this.charService.achievements;
+      this.achievements = this.achievementService.getVisibleAchievements();
     }
   }
 
+  refreshView() {
+    this.activeQuests = this.achievementService.getVisibleAchievements();
+    this.trophyCase = this.achievementService.getTrophyCase();
+  }
+
   async claim(ach: Achievement) {
-    const xp = this.charService.claimAchievement(ach.id);
+    const xp = this.achievementService.claim(ach.id);
 
     const toast = await this.toastCtrl.create({
       message: `Claimed ${xp} XP! Level up progress!`,

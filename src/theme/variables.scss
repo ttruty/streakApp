@@ -101,4 +101,27 @@
   --ion-card-background: #1e1e1e;
   --ion-toolbar-background: #1f1f1f;
   --ion-tab-bar-background: #1f1f1f;
+
+  /** * 1. MAIN FONT (Urbanist)
+   * Applied to the entire body, labels, and paragraphs.
+   **/
+  --ion-font-family: 'Urbanist', sans-serif;
+
+  /**
+   * 2. SECONDARY FONT (Barlow)
+   * Best for UI elements like buttons and tabs.
+   **/
+  --secondary-font: 'Barlow', sans-serif;
+
+  /**
+   * 3. TERTIARY FONT (Prompt)
+   * For the "ARC Raiders" heavy heading look.
+   **/
+  --tertiary-font: 'Prompt', sans-serif;
+
+  /**
+   * 4. QUATERNARY FONT (JetBrains Mono)
+   * For data, tech-stats, or code.
+   **/
+  --mono-font: 'JetBrains Mono', monospace;
 }

@@ -15,6 +15,7 @@ import {
 import { ViewDidEnter } from '@ionic/angular/standalone';
 import { Item, InventoryService } from 'src/app/services/inventory';
 import { CharacterService } from 'src/app/services/character';
+import { AchievementService } from 'src/app/services/achievement';
 
 @Component({
   selector: 'app-inventory',
@@ -32,14 +33,14 @@ export class InventoryPage implements ViewDidEnter {
     private inventoryService: InventoryService,
     private actionSheetCtrl: ActionSheetController,
     private toastCtrl: ToastController,
-    private charService: CharacterService,
+    private achievementService: AchievementService,
   ) {
     addIcons({ cubeOutline, cashOutline, flask, diamond, flame, trash, handLeft, pricetag, diamondOutline, keyOutline, shieldOutline, hammerOutline, leafOutline, skullOutline, mapOutline, flaskOutline });
   }
 
   ionViewDidEnter() {
     this.loadData();
-    this.charService.notifyInventoryUpdate(this.items); // <--- ADD THIS
+    this.achievementService.notifyInventoryUpdate(this.items); // <--- ADD THIS
   }
 
   loadData() {

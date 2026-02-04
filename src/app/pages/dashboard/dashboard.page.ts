@@ -1,4 +1,4 @@
-import { Component, ElementRef, ViewChild, OnDestroy, AfterViewInit } from '@angular/core';
+import { Component, ElementRef, ViewChild, OnDestroy, AfterViewInit, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {
@@ -9,13 +9,12 @@ import {
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { settingsOutline, flame } from 'ionicons/icons';
-import { ToastController } from '@ionic/angular/standalone';
 
 // // Three.js Imports
 // import * as THREE from 'three';
 // import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
-import { RewardModalComponent } from 'src/app/components/reward-modal/reward-modal.component';
-import { InventoryService, Item } from 'src/app/services/inventory';
+import { InventoryService } from 'src/app/services/inventory';
+import { ToastController } from '@ionic/angular/standalone';
 import { ModalController } from '@ionic/angular/standalone';
 import { Habit, HabitService } from 'src/app/services/habit';
 import {
@@ -32,6 +31,10 @@ import { CompletionModalComponent } from '../../components/completion-modal/comp
 import { CharacterService } from 'src/app/services/character';
 import { CharacterModelComponent } from 'src/app/components/character-model/character-model.component';
 import { HabitDetailModalComponent } from 'src/app/components/habit-detail-modal/habit-detail-modal.component';
+import { SoundService } from 'src/app/services/sound';
+import { Router } from '@angular/router';
+import { SettingsPage } from '../settings/settings.page';
+import { AchievementService } from 'src/app/services/achievement';
 
 @Component({
   selector: 'app-dashboard',
@@ -55,9 +58,11 @@ export class DashboardPage {
     private modalCtrl: ModalController,
     private habitService: HabitService,
     private toastCtrl: ToastController,
-    private inventoryService: InventoryService,
     private alertCtrl: AlertController,
     public charService: CharacterService,
+    private soundService: SoundService,
+    private achService: AchievementService,
+    private router: Router
   ) {
     addIcons({ settingsOutline });
     addIcons({
@@ -70,56 +75,46 @@ export class DashboardPage {
       wallet, wifi, wine, accessibility, basket, beer, camera, car,
       chatbubble, clipboard, colorPalette, desktop, flame
     });
+
+    // 1. REGISTER EFFECT (Must be in constructor)
+    effect(() => {
+      // 2. READ SIGNAL (Creates dependency)
+      const achievement = this.achService.lastUnlocked();
+
+      // 3. REACT (If an achievement exists)
+      if (achievement) {
+        // We wrap the async call to keep the effect clean
+        this.presentAchievementToast(achievement);
+      }
+    });
+  }
+
+  // Separated helper for the async UI logic
+  async presentAchievementToast(ach: any) {
+    const toast = await this.toastCtrl.create({
+      header: 'Achievement Unlocked!',
+      message: `${ach.title} - Click to Claim`,
+      position: 'top',
+      duration: 4000,
+      color: 'warning',
+      icon: 'trophy',
+      buttons: [
+        {
+          side: 'end',
+          text: 'CLAIM',
+          handler: () => {
+            this.router.navigate(['/tabs/character']);
+          }
+        }
+      ]
+    });
+
+    await toast.present();
   }
 
   ionViewDidEnter() {
     this.habitService.checkDateAndReset();
     this.habits = this.habitService.getHabits();
-  }
-
-  // rewardsPool: Item[] = [
-  //   { id: '1', name: 'Gold Coin', icon: 'cash-outline', rarity: 'common' },
-  //   { id: '2', name: 'Diamond', icon: 'diamond-outline', rarity: 'legendary' },
-  //   { id: '3', name: 'Potion', icon: 'flask-outline', rarity: 'rare' },
-  //   { id: '4', name: 'Shield', icon: 'shield-outline', rarity: 'common' },
-  // ];
-
-
-  async openReward() {
-    // 1. Generate 1 to 5 random items from the inventory system
-    const randomLoot = this.inventoryService.getRandomItems(1, 5);
-
-    console.log('Generated Loot Pool:', randomLoot);
-
-    const modal = await this.modalCtrl.create({
-      component: RewardModalComponent,
-      componentProps: {
-        // Pass the dynamic list instead of the hardcoded rewardsPool
-        possibleRewards: randomLoot
-      },
-      cssClass: 'my-custom-modal-css',
-      backdropDismiss: false
-    });
-
-    await modal.present();
-
-    const { data } = await modal.onDidDismiss();
-
-    // 3. Handle Collection (actually add to inventory)
-    if (data?.claimed && data?.reward) {
-      console.log('User collected:', data.reward);
-
-      // If the modal returns a specific chosen item, add it:
-      this.inventoryService.addItem(data.reward);
-
-      const toast = await this.toastCtrl.create({
-        message: `Collected ${data.reward.name}!`,
-        duration: 2000,
-        color: 'success',
-        position: 'top'
-      });
-      toast.present();
-    }
   }
 
   async openHabitDetail(habit: Habit) {
@@ -195,6 +190,8 @@ export class DashboardPage {
       this.charService.modifyStat(habit.associatedStat, habit.difficulty, true);
       this.refreshData(); // Helper to reload list
       return;
+    } else {
+      this.soundService.play('boop');
     }
 
     // If checking -> Reset box first (wait for modal)
@@ -216,10 +213,8 @@ export class DashboardPage {
       // User selected a mood and confirmed
       // 1. Mark complete
       this.habitService.completeHabit(habit.id, data);
-      this.charService.notifyHabitComplete(habit.streak); // <--- ADD THIS
+      this.achService.notifyHabitComplete(habit.streak); // <--- ADD THIS
       this.charService.modifyStat(habit.associatedStat, habit.difficulty, false);
-
-      this.openReward();
       this.refreshData(); // Reload from service to show checked state
     } else {
       // User cancelled modal -> keep it unchecked (which we already did)
@@ -229,5 +224,16 @@ export class DashboardPage {
 
   refreshData() {
     this.habits = this.habitService.getHabits();
+  }
+
+  async openSettings() {
+    const modal = await this.modalCtrl.create({
+      component: SettingsPage,
+      // OPTIONAL: Make it a "Sheet Modal" (slides up partially)
+      initialBreakpoint: 1,
+      breakpoints: [0, 0.5, 1],
+      handle: true
+    });
+    await modal.present();
   }
 }
