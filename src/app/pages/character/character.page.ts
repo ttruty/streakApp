@@ -112,6 +112,8 @@ export class CharacterPage implements OnInit, ViewDidEnter { // <--- Add impleme
     });
     toast.present();
 
+    this.charService.addXp(xp);
+
     this.refresh();
   }
 

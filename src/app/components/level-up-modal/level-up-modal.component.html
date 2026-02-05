@@ -1,0 +1,20 @@
+<ion-content class="level-up-content">
+  <div class="container">
+
+    <div class="burst-bg"></div>
+
+    <div class="icon-wrapper">
+      <ion-icon name="star" class="star-icon"></ion-icon>
+      <div class="level-badge">{{ level }}</div>
+    </div>
+
+    <h1>LEVEL UP!</h1>
+
+    <p class="subtitle">You are now level {{ level }}</p>
+
+    <ion-button expand="block" color="warning" shape="round" (click)="dismiss()">
+      AWESOME!
+    </ion-button>
+
+  </div>
+</ion-content>

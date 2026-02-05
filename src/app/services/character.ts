@@ -4,6 +4,7 @@ import { InventoryService } from './inventory';
 import { ToastController } from '@ionic/angular/standalone';
 import { ModalController } from '@ionic/angular/standalone';
 import { BuffService } from './buff';
+import { LevelUpModalComponent } from '../components/level-up-modal/level-up-modal.component';
 
 // --- Interfaces for our data ---
 export interface GameAsset {
@@ -265,7 +266,6 @@ export class CharacterService {
 
   // --- XP SYSTEM ---
   addXp(amount: number) {
-
     const buff = this.buffService.activeBuff();
     let finalAmount = amount;
 
@@ -273,19 +273,44 @@ export class CharacterService {
       finalAmount = Math.floor(amount * buff.xpMultiplier);
     }
 
-    this.state.currentXp += amount;
+    this.state.currentXp += finalAmount;
+
+    // Call the check
     this.checkLevelUp();
+
     this.saveData();
   }
 
-  private checkLevelUp() {
-    if (this.state.currentXp >= this.state.maxXp) {
+  private async checkLevelUp() {
+    const startLevel = this.state.level;
+
+    // 1. Loop until XP is below max (Handles multiple level ups)
+    while (this.state.currentXp >= this.state.maxXp) {
       this.state.currentXp -= this.state.maxXp;
       this.state.level++;
-      this.state.maxXp = Math.floor(this.state.maxXp * 1.5); // Harder each level
-      // Recursively check in case we gained HUGE xp
-      this.checkLevelUp();
+
+      // Increase difficulty curve
+      this.state.maxXp = Math.floor(this.state.maxXp * 1.5);
     }
+
+    // 2. Only show modal if level actually changed
+    if (this.state.level > startLevel) {
+      await this.showLevelUpModal(this.state.level);
+    }
+  }
+
+  private async showLevelUpModal(newLevel: number) {
+    const modal = await this.modalCtrl.create({
+      component: LevelUpModalComponent,
+      componentProps: { level: newLevel },
+      cssClass: 'transparent-modal', // See Step 3 below
+      backdropDismiss: false
+    });
+
+    await modal.present();
+
+    // Play sound if you have SoundService available here
+    // this.soundService.play('levelup');
   }
 
     async openReward() {
