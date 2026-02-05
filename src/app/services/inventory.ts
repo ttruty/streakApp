@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { AchievementService } from './achievement';
 
 export interface Item {
   id: string;
@@ -18,7 +19,7 @@ export class InventoryService {
   private STORAGE_KEY = 'user_inventory';
   private GOLD_KEY = 'user_gold';
 
-  constructor() {}
+  constructor(private achievementService: AchievementService) {}
 
   // --- GETTERS ---
   getInventory(): Item[] {
@@ -41,20 +42,22 @@ export class InventoryService {
   // Add Item (Stacks if exists)
   addItem(newItem: Item) {
     const items = this.getInventory();
-    const existing = items.find(i => i.id === newItem.id);
+    const existing = items.find(i => i.id.split('_')[0] === newItem.id.split('_')[0]);
 
     if (existing) {
       existing.quantity += newItem.quantity;
     } else {
       items.push(newItem);
     }
+    this.achievementService.notifyInventoryUpdate(items); // Check if this unlocks any collection achievements
     this.saveInventory(items);
+
   }
 
   // Remove Item (Reduce quantity or delete)
   removeItem(itemId: string, amount: number = 1) {
     let items = this.getInventory();
-    const index = items.findIndex(i => i.id === itemId);
+    const index = items.findIndex(i => i.id.split('_')[0] === itemId.split('_')[0]);
 
     if (index > -1) {
       items[index].quantity -= amount;

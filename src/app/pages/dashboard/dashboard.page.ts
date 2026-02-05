@@ -1,4 +1,4 @@
-import { Component, ElementRef, ViewChild, OnDestroy, AfterViewInit, effect } from '@angular/core';
+import { Component, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {
@@ -8,7 +8,7 @@ import {
   IonItemSliding, IonItemOptions, IonItemOption, AlertController
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { settingsOutline, flame } from 'ionicons/icons';
+import { settingsOutline, flame, flash } from 'ionicons/icons';
 
 // // Three.js Imports
 // import * as THREE from 'three';
@@ -35,6 +35,8 @@ import { SoundService } from 'src/app/services/sound';
 import { Router } from '@angular/router';
 import { SettingsPage } from '../settings/settings.page';
 import { AchievementService } from 'src/app/services/achievement';
+import { BuffService } from 'src/app/services/buff';
+import { BuffModalComponent } from 'src/app/components/buff-modal/buff-modal.component';
 
 @Component({
   selector: 'app-dashboard',
@@ -53,6 +55,7 @@ import { AchievementService } from 'src/app/services/achievement';
 export class DashboardPage {
 
   habits: Habit[] = []; // Change to use Habit interface
+  animatingHabits = new Set<string>();
 
   constructor(
     private modalCtrl: ModalController,
@@ -62,7 +65,8 @@ export class DashboardPage {
     public charService: CharacterService,
     private soundService: SoundService,
     private achService: AchievementService,
-    private router: Router
+    private router: Router,
+    public buffService: BuffService,
   ) {
     addIcons({ settingsOutline });
     addIcons({
@@ -73,7 +77,7 @@ export class DashboardPage {
       people, pizza, planet, restaurant, shapes, shirt, sparkles, star,
       storefront, terminal, thumbsUp, timer, tv, umbrella, videocam, walk,
       wallet, wifi, wine, accessibility, basket, beer, camera, car,
-      chatbubble, clipboard, colorPalette, desktop, flame
+      chatbubble, clipboard, colorPalette, desktop, flame, flash
     });
 
     // 1. REGISTER EFFECT (Must be in constructor)
@@ -114,7 +118,7 @@ export class DashboardPage {
 
   ionViewDidEnter() {
     this.habitService.checkDateAndReset();
-    this.habits = this.habitService.getHabits();
+    this.refreshData();
   }
 
   async openHabitDetail(habit: Habit) {
@@ -125,7 +129,14 @@ export class DashboardPage {
     return await modal.present();
   }
 
-
+  async openBuffModal() {
+    const modal = await this.modalCtrl.create({
+      component: BuffModalComponent,
+      initialBreakpoint: 0.6,
+      breakpoints: [0, 0.6, 1]
+    });
+    await modal.present();
+  }
 
   // New Method: Delete with Confirmation
   async deleteHabit(habit: Habit) {
@@ -181,49 +192,46 @@ export class DashboardPage {
   }
 
   async onToggleHabit(event: any, habit: Habit) {
-    // Prevent default simple toggling behavior
     const isChecking = event.detail.checked;
 
-    // If we are unchecking, just do it directly
+    // CASE 1: Unchecking (Moving back to active)
     if (!isChecking) {
       this.habitService.uncompleteHabit(habit.id);
       this.charService.modifyStat(habit.associatedStat, habit.difficulty, true);
-      this.refreshData(); // Helper to reload list
+      this.refreshData();
       return;
-    } else {
-      this.soundService.play('boop');
     }
 
-    // If checking -> Reset box first (wait for modal)
-    // We modify the array directly to visually revert check until confirmed
-    habit.completed = false;
+    // CASE 2: Checking (Completing)
+    else {
+      // 1. Play Sound
+      this.soundService.play('boop'); // or 'boop'
 
-    const modal = await this.modalCtrl.create({
-      component: CompletionModalComponent,
-      breakpoints: [0, 0.5, 0.8], // Helper sheet style
-      initialBreakpoint: 0.5,
-      cssClass: 'custom-modal'
-    });
+      // 2. Start Animation (Apply class in HTML)
+      this.animatingHabits.add(habit.id);
 
-    await modal.present();
+      // 3. Wait for Animation to finish (500ms matches CSS)
+      setTimeout(() => {
+        // 4. Perform Logic
+        this.habitService.completeHabit(habit.id, "happy");
+        this.achService.notifyHabitComplete(habit.streak);
+        this.charService.modifyStat(habit.associatedStat, habit.difficulty, false);
 
-    const { data } = await modal.onWillDismiss();
+        // 5. Remove from View
+        this.refreshData();
 
-    if (data) {
-      // User selected a mood and confirmed
-      // 1. Mark complete
-      this.habitService.completeHabit(habit.id, data);
-      this.achService.notifyHabitComplete(habit.streak); // <--- ADD THIS
-      this.charService.modifyStat(habit.associatedStat, habit.difficulty, false);
-      this.refreshData(); // Reload from service to show checked state
-    } else {
-      // User cancelled modal -> keep it unchecked (which we already did)
-      this.refreshData();
+        // 6. Cleanup
+        this.animatingHabits.delete(habit.id);
+      }, 500);
     }
   }
 
   refreshData() {
-    this.habits = this.habitService.getHabits();
+    // 1. Get all habits
+    const allHabits = this.habitService.getHabits();
+
+    // 2. Filter: Only show habits that are NOT completed
+    this.habits = allHabits.filter(h => !h.completed);
   }
 
   async openSettings() {

@@ -69,7 +69,7 @@ export class CharacterPage implements OnInit, ViewDidEnter { // <--- Add impleme
     private charService: CharacterService,
     private toastCtrl: ToastController,
     private alertCtrl: AlertController,
-    private achievementService: AchievementService
+    private achievementService: AchievementService,
   ) {
     addIcons({barbell,book,heart,flash,chatbubble,checkmarkCircle});
   }
@@ -101,6 +101,8 @@ export class CharacterPage implements OnInit, ViewDidEnter { // <--- Add impleme
 
   async claim(ach: Achievement) {
     const xp = this.achievementService.claim(ach.id);
+
+    this.charService.openReward(); // Generate loot based on achievement
 
     const toast = await this.toastCtrl.create({
       message: `Claimed ${xp} XP! Level up progress!`,

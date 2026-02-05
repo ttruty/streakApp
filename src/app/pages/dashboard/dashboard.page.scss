@@ -123,3 +123,103 @@ ion-item-sliding {
   /* ... keep existing styles ... */
   height: fit-content;
 }
+
+.fireworks {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.pop-out {
+  animation: pop 1s ease-out forwards;
+}
+
+.burst {
+  position: absolute;
+  width: 0;
+  height: 0;
+
+  /* Default Particle Styles */
+  i {
+    position: absolute;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    opacity: 0;
+  }
+}
+
+/* --- BURST POSITIONS & DELAYS --- */
+
+/* Burst 1: Near the Checkbox */
+.burst:nth-child(1) {
+  top: 50%;
+  left: 40px;
+}
+
+/* Burst 2: Center (Delayed 100ms) */
+.burst:nth-child(2) {
+  top: 30%;
+  left: 40%;
+
+  // i { animation-delay: 0.1s !important; }
+}
+
+/* Burst 3: Right Side (Delayed 200ms) */
+.burst:nth-child(3) {
+  top: 60%;
+  left: 70%;
+
+  // i { animation-delay: 0.2s !important; }
+}
+
+/* --- ANIMATION TRIGGER --- */
+.pop-out .burst i {
+  animation: bang 0.6s ease-out forwards;
+}
+
+/* --- RANDOM PARTICLES GENERATOR --- */
+$colors: #ffc409, #eb445a, #2dd36f, #3880ff, #9d46ff;
+
+@for $i from 1 through 8 {
+  .burst i:nth-child(#{$i}) {
+    /* Random trajectory for each particle */
+    $x: random(100) - 50 + px;
+    $y: random(100) - 50 + px;
+
+    background: nth($colors, random(length($colors)));
+
+    --x: #{$x};
+    --y: #{$y};
+  }
+}
+
+@keyframes pop {
+  0% {
+    transform: translate(0, 0) scale(1.1);
+    opacity: 1;
+  }
+  10% {
+    transform: translate(0, 0) scale(1.2);
+    opacity: .90;
+  }
+  100% {
+    transform: translate(var(--x), var(--y)) scale(0);
+    opacity: 0;
+  }
+}
+
+@keyframes bang {
+  0% {
+    transform: translate(0, 0) scale(2);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(var(--x), var(--y)) scale(0);
+    opacity: 0;
+  }
+}

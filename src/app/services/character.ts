@@ -3,6 +3,7 @@ import { RewardModalComponent } from '../components/reward-modal/reward-modal.co
 import { InventoryService } from './inventory';
 import { ToastController } from '@ionic/angular/standalone';
 import { ModalController } from '@ionic/angular/standalone';
+import { BuffService } from './buff';
 
 // --- Interfaces for our data ---
 export interface GameAsset {
@@ -195,6 +196,7 @@ export class CharacterService {
         private modalCtrl: ModalController,
         private toastCtrl: ToastController,
         private inventoryService: InventoryService,
+        private buffService: BuffService
   ) {
     this.loadData();
   }
@@ -259,8 +261,18 @@ export class CharacterService {
     }));
   }
 
+
+
   // --- XP SYSTEM ---
   addXp(amount: number) {
+
+    const buff = this.buffService.activeBuff();
+    let finalAmount = amount;
+
+    if (buff) {
+      finalAmount = Math.floor(amount * buff.xpMultiplier);
+    }
+
     this.state.currentXp += amount;
     this.checkLevelUp();
     this.saveData();
@@ -313,29 +325,29 @@ export class CharacterService {
       }
     }
 
-  // Call this when habit is done (isPenalty = false) or missed (isPenalty = true)
+    // 1. UPDATE STAT LOGIC
   modifyStat(stat: keyof CharacterStats, difficulty: 'easy' | 'medium' | 'hard', isPenalty: boolean = false) {
     let amount = 0;
 
-    // 1. Determine base value
     switch(difficulty) {
-      case 'easy': amount = 0.1; break;   // Small incremental growth
+      case 'easy': amount = 0.1; break;
       case 'medium': amount = 0.3; break;
       case 'hard': amount = 0.5; break;
     }
 
-    // 2. Flip if penalty
     if (isPenalty) {
-      amount = amount * -1; // Lose stats
+      amount = amount * -1;
+    } else {
+      // --- APPLY BUFF MULTIPLIER (Only on Gain) ---
+      const buff = this.buffService.activeBuff();
+      if (buff) {
+        amount = amount * buff.statMultiplier;
+      }
     }
 
-    // 3. Apply Update
     if (this.state.stats[stat] !== undefined) {
       this.state.stats[stat] = parseFloat((this.state.stats[stat] + amount).toFixed(1));
-
-      // Cap stats so they don't go below 1
       if (this.state.stats[stat] < 1) this.state.stats[stat] = 1;
-
       this.saveData();
     }
   }

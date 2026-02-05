@@ -5,8 +5,13 @@
     </ion-buttons>
     <ion-title
     >ARC Runners</ion-title>
-    <ion-buttons slot="end" (click)="openSettings()">
-      <ion-button>
+    <ion-buttons slot="end">
+
+      <ion-button (click)="openBuffModal()">
+        <ion-icon name="flash" [color]="buffService.activeBuff() ? 'warning' : 'medium'"></ion-icon>
+      </ion-button>
+
+      <ion-button (click)="openSettings()">
         <ion-icon name="settings-outline"></ion-icon>
       </ion-button>
     </ion-buttons>
@@ -21,9 +26,10 @@
 
     <div class="habits-section">
       <h3>Today's Quests</h3>
+
       <ion-list lines="none" class="habit-list">
 
-        <ion-item-sliding *ngFor="let habit of habits">
+        <ion-item-sliding *ngFor="let habit of habits" [class.pop-out]="animatingHabits.has(habit.id)">
 
           <ion-item class="habit-item"
             [class.rarity-low]="habit.reward === 'low'"
@@ -31,6 +37,17 @@
             [class.rarity-high]="habit.reward === 'high'"
             >
 
+            <div class="fireworks">
+    <div class="burst">
+      <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+    </div>
+    <div class="burst">
+      <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+    </div>
+    <div class="burst">
+      <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+    </div>
+  </div>
 
 
             <ion-checkbox slot="start" [checked]="habit.completed"
