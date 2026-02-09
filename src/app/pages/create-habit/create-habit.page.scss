@@ -284,3 +284,24 @@
 }
 
 
+
+// Default background (when nothing is selected or for 'good')
+ion-content.good {
+    --background: #004d06; // Light blue or green tint
+    transition: --background 0.3s ease; // Smooth color transition
+}
+
+// Background when 'vice' is selected
+ion-content.vice {
+    --background: #540000; // Subtle red/pink tint
+    transition: --background 0.3s ease;
+}
+
+// Optional: If you want to change the form container background too
+.good .form-container {
+    /* specific styles for good habits */
+}
+
+.vice .form-container {
+    /* specific styles for vice habits */
+}

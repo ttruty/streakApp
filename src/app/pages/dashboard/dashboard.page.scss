@@ -1,225 +1,150 @@
-.urbanist-font {
-  font-family: 'Urbanist', sans-serif !important;
-}
-
-.split-layout {
+.dashboard-container {
   display: flex;
   flex-direction: column;
   height: 100%;
-  overflow: hidden; /* Prevent body scroll */
+  padding: 10px;
 }
 
-
-.habits-section {
-  /* --- SCROLLING MAGIC --- */
-  overflow-y: auto; /* Allows this specific box to scroll */
-  -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
-  flex: 1;
-  background: #000000;
-  border-top-left-radius: 30px;
-  border-top-right-radius: 30px;
-  box-shadow: 0 -5px 20px rgba(0,0,0,0.05);
-  padding: 20px;
-  margin-top: -20px;
-  z-index: 10; // Higher than character section
-  padding-bottom: 100px;
+/* --- HERO SECTION --- */
+.hero-section {
+  flex: 0 0 auto;
+  min-height: 250px; /* Adjust based on your model size */
+  margin-bottom: 20px;
+  background: radial-gradient(circle at center, #333 0%, #121212 70%);
+  border-radius: 16px;
+  overflow: hidden;
 }
 
-.habit-item {
-  margin-bottom: 0px; /* Reset this, let the sliding wrapper handle spacing */
-  --border-radius: 12px;
-  border-radius: 12px;
-  --color: white; /* White text for all */
-
-  /* 1. Low Loot (Common) - Dark Slate/Grey */
-  &.rarity-low {
-    --background: #37474f;
-    border: 1px solid #546e7a;
-  }
-
-  /* 2. Medium Loot (Rare) - Deep Blue */
-  &.rarity-medium {
-    --background: #1565c0;
-    border: 1px solid #42a5f5;
-  }
-
-  /* 3. High Loot (Legendary) - Deep Gold/Orange */
-  &.rarity-high {
-    --background: #5d144b;
-    border: 1px solid #ff00e6;
-  }
-}
-
-/* Add spacing to the wrapper so the items don't stick together */
-ion-item-sliding {
-  margin-bottom: 12px;
-  background: transparent;
-  border-radius: 12px;
-}
-.habit-list {
-  border-radius: 10px;
-}
-
-.streak-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-
-  /* Glass effect: See-through white */
-  background: rgba(255, 255, 255, 0.2);
-
-  padding: 4px 10px;
-  border-radius: 20px; /* Pill shape */
-  margin-top: 6px;
-  width: fit-content;
-
-  ion-icon {
-    font-size: 14px;
-    color: #ffca28; /* Flame Color (Amber) */
-  }
-
-  span {
-    font-size: 12px;
-    font-weight: 600;
-    color: white;
-    letter-spacing: 0.5px;
-  }
-}
-
-.meta-row {
+/* --- GRID LAYOUT --- */
+.lists-grid {
   display: flex;
-  gap: 8px; /* Space between Streak and Stat */
-  margin-top: 6px;
+  flex-direction: row; /* Side by side */
+  gap: 16px;
+  align-items: flex-start;
 }
 
-/* --- STAT BADGE --- */
-.stat-chip {
-  display: inline-flex;
+.list-column {
+  flex: 1; /* Both take equal space */
+  min-width: 0; /* Prevents flex overflow */
+}
+
+/* Headers */
+h3 {
+  font-size: 18px;
+  font-weight: 800;
+  margin-bottom: 12px;
+  margin-left: 5px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.danger-header {
+  color: var(--ion-color-danger);
+}
+
+/* --- RESPONSIVE BREAKPOINT --- */
+/* On phones (less than 768px), stack them vertically */
+@media (max-width: 768px) {
+  .lists-grid {
+    flex-direction: column;
+  }
+
+  .list-column {
+    width: 100%;
+    margin-bottom: 20px;
+  }
+}
+
+/* --- ITEM STYLING FIXES --- */
+
+/* Good Habit Styling */
+.habit-item {
+  --background: #1e1e1e;
+  --border-radius: 12px;
+  margin-bottom: 8px;
+  --padding-start: 10px;
+  --padding-end: 10px;
+  border-left: 4px solid var(--ion-color-success);
+}
+
+/* Difficulty Borders */
+.habit-item.rarity-low { border-left-color: var(--ion-color-success); }
+.habit-item.rarity-medium { border-left-color: var(--ion-color-warning); }
+.habit-item.rarity-high { border-left-color: var(--ion-color-tertiary); }
+
+/* Vice Item Styling */
+.vice-item {
+  --background: rgba(var(--ion-color-danger-rgb), 0.08);
+  --border-radius: 12px;
+  margin-bottom: 8px;
+  border-left: 4px solid var(--ion-color-danger);
+}
+
+/* Inner Layout Helper */
+.content-wrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding-left: 10px;
+  cursor: pointer;
+}
+
+.title-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.habit-icon {
+  font-size: 20px;
+  color: #888;
+}
+
+.streak-text {
+  font-size: 12px;
+  color: #666;
+  display: flex;
   align-items: center;
   gap: 4px;
-  padding: 4px 8px;
-  border-radius: 6px;
-  font-size: 10px;
-  font-weight: 800;
-  letter-spacing: 0.5px;
-  background: rgba(0,0,0,0.2); /* Fallback dark background */
+}
+
+/* Stat Badge */
+.stat-badge {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  background: rgba(255,255,255,0.1);
+  color: #fff;
+}
+
+.stat-badge.danger {
+  background: var(--ion-color-danger);
   color: white;
-  border: 1px solid rgba(255,255,255,0.1);
-
-  ion-icon {
-    font-size: 12px;
-  }
-
-  /* COLOR CODING */
-  &.strength     { background: rgba(244, 67, 54, 0.2); color: #ff8a80; border-color: #f44336; }
-  &.intelligence { background: rgba(33, 150, 243, 0.2); color: #90caf9; border-color: #2196f3; }
-  &.constitution { background: rgba(76, 175, 80, 0.2);  color: #a5d6a7; border-color: #4caf50; }
-  &.dexterity    { background: rgba(255, 152, 0, 0.2);  color: #ffcc80; border-color: #ff9800; }
-  &.charisma     { background: rgba(156, 39, 176, 0.2); color: #ce93d8; border-color: #9c27b0; }
 }
 
-/* Update Streak Chip to match size if needed */
-.streak-chip {
-  /* ... keep existing styles ... */
-  height: fit-content;
+/* Empty State */
+.empty-state {
+  text-align: center;
+  padding: 20px;
+  color: #555;
+  border: 1px dashed #333;
+  border-radius: 12px;
 }
 
-.fireworks {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  z-index: 10;
+
+/* Shake Animation for Damage */
+.shake {
+  animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
 }
 
-.pop-out {
-  animation: pop 1s ease-out forwards;
-}
-
-.burst {
-  position: absolute;
-  width: 0;
-  height: 0;
-
-  /* Default Particle Styles */
-  i {
-    position: absolute;
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    opacity: 0;
-  }
-}
-
-/* --- BURST POSITIONS & DELAYS --- */
-
-/* Burst 1: Near the Checkbox */
-.burst:nth-child(1) {
-  top: 50%;
-  left: 40px;
-}
-
-/* Burst 2: Center (Delayed 100ms) */
-.burst:nth-child(2) {
-  top: 30%;
-  left: 40%;
-
-  // i { animation-delay: 0.1s !important; }
-}
-
-/* Burst 3: Right Side (Delayed 200ms) */
-.burst:nth-child(3) {
-  top: 60%;
-  left: 70%;
-
-  // i { animation-delay: 0.2s !important; }
-}
-
-/* --- ANIMATION TRIGGER --- */
-.pop-out .burst i {
-  animation: bang 0.6s ease-out forwards;
-}
-
-/* --- RANDOM PARTICLES GENERATOR --- */
-$colors: #ffc409, #eb445a, #2dd36f, #3880ff, #9d46ff;
-
-@for $i from 1 through 8 {
-  .burst i:nth-child(#{$i}) {
-    /* Random trajectory for each particle */
-    $x: random(100) - 50 + px;
-    $y: random(100) - 50 + px;
-
-    background: nth($colors, random(length($colors)));
-
-    --x: #{$x};
-    --y: #{$y};
-  }
-}
-
-@keyframes pop {
-  0% {
-    transform: translate(0, 0) scale(1.1);
-    opacity: 1;
-  }
-  10% {
-    transform: translate(0, 0) scale(1.2);
-    opacity: .90;
-  }
-  100% {
-    transform: translate(var(--x), var(--y)) scale(0);
-    opacity: 0;
-  }
-}
-
-@keyframes bang {
-  0% {
-    transform: translate(0, 0) scale(2);
-    opacity: 1;
-  }
-  100% {
-    transform: translate(var(--x), var(--y)) scale(0);
-    opacity: 0;
-  }
+@keyframes shake {
+  10%, 90% { transform: translate3d(-1px, 0, 0); }
+  20%, 80% { transform: translate3d(2px, 0, 0); }
+  30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+  40%, 60% { transform: translate3d(4px, 0, 0); }
 }

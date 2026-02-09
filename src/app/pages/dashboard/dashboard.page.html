@@ -3,14 +3,11 @@
     <ion-buttons slot="start">
       <ion-menu-button></ion-menu-button>
     </ion-buttons>
-    <ion-title
-    >ARC Runners</ion-title>
+    <ion-title>ARC Runners</ion-title>
     <ion-buttons slot="end">
-
       <ion-button (click)="openBuffModal()">
         <ion-icon name="flash" [color]="buffService.activeBuff() ? 'warning' : 'medium'"></ion-icon>
       </ion-button>
-
       <ion-button (click)="openSettings()">
         <ion-icon name="settings-outline"></ion-icon>
       </ion-button>
@@ -18,70 +15,109 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true" scrollY="false">
-  <div class="split-layout">
+<ion-content [fullscreen]="true">
 
-    <app-character-model>
-    </app-character-model>
+  <div class="dashboard-container">
 
-    <div class="habits-section">
-      <h3>Today's Quests</h3>
-
-      <ion-list lines="none" class="habit-list">
-
-        <ion-item-sliding *ngFor="let habit of habits" [class.pop-out]="animatingHabits.has(habit.id)">
-
-          <ion-item class="habit-item"
-            [class.rarity-low]="habit.reward === 'low'"
-            [class.rarity-medium]="habit.reward === 'medium'"
-            [class.rarity-high]="habit.reward === 'high'"
-            >
-
-            <div class="fireworks">
-    <div class="burst">
-      <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+    <div class="hero-section">
+      <app-character-model></app-character-model>
     </div>
-    <div class="burst">
-      <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
-    </div>
-    <div class="burst">
-      <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
-    </div>
-  </div>
 
+    <div class="lists-grid">
 
-            <ion-checkbox slot="start" [checked]="habit.completed"
-            (ionChange)="onToggleHabit($event, habit)"></ion-checkbox>
+      <div class="list-column good-column">
+        <h3>Daily Quests</h3>
 
-            <div class="habit-icon-circle" slot="start">
-              <ion-icon [name]="habit.icon"></ion-icon>
-            </div>
+        <ion-list lines="none" class="habit-list">
+          <ion-item-sliding *ngFor="let habit of goodHabits" [class.pop-out]="animatingHabits.has(habit.id)">
 
-            <div class="content-wrapper" (click)="openHabitDetail(habit)" style="flex: 1; display: flex; align-items: center;">
-            <ion-label>
-                <h2>{{ habit.title }}</h2>
-                <div class="streak-chip">
-                  <ion-icon name="flame"></ion-icon>
-                  <span>{{ habit.streak }} Days</span>
-                </div>
-              </ion-label>
-            </div>
+            <ion-item class="habit-item"
+              [class.rarity-low]="habit.difficulty === 'easy'"
+              [class.rarity-medium]="habit.difficulty === 'medium'"
+              [class.rarity-high]="habit.difficulty === 'hard'">
 
-              <div class="stat-chip" [ngClass]="habit.associatedStat">
-                <ion-icon [name]="getStatIcon(habit.associatedStat)"></ion-icon>
-                <span>{{ (habit.associatedStat) }}</span>
+              <div class="fireworks">
+                <div class="burst"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+                <div class="burst"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+                <div class="burst"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
               </div>
-          </ion-item>
 
-          <ion-item-options side="end">
-            <ion-item-option color="danger" (click)="deleteHabit(habit)">
-              <ion-icon slot="icon-only" name="trash"></ion-icon>
-            </ion-item-option>
-          </ion-item-options>
+              <ion-checkbox slot="start"
+                [checked]="habit.completed"
+                (ionChange)="onToggleHabit($event, habit)">
+              </ion-checkbox>
 
-        </ion-item-sliding>
+              <div class="content-wrapper" (click)="openHabitDetail(habit)">
+                <div class="title-row">
+                  <ion-icon [name]="habit.icon || 'star'" class="habit-icon"></ion-icon>
+                  <ion-label>
+                    <h2>{{ habit.title }}</h2>
+                    <p class="streak-text">
+                      <ion-icon name="flame" color="warning"></ion-icon> {{ habit.streak }} Days
+                    </p>
+                  </ion-label>
+                </div>
+              </div>
+
+              <div class="stat-badge" [ngClass]="habit.associatedStat">
+                <ion-icon [name]="getStatIcon(habit.associatedStat)"></ion-icon>
+              </div>
+
+            </ion-item>
+
+            <ion-item-options side="end">
+              <ion-item-option color="danger" (click)="deleteHabit(habit)">
+                <ion-icon slot="icon-only" name="trash"></ion-icon>
+              </ion-item-option>
+            </ion-item-options>
+
+          </ion-item-sliding>
+
+          <div *ngIf="goodHabits.length === 0" class="empty-state">
+            <p>No quests active.</p>
+          </div>
         </ion-list>
-    </div>
+      </div>
 
+      <div class="list-column bad-column">
+        <h3 class="danger-header">Vices</h3>
+
+        <ion-list lines="none">
+          <ion-item-sliding *ngFor="let vice of vices" [id]="vice.id">
+
+            <ion-item class="vice-item">
+              <ion-button slot="start" color="danger" fill="clear" (click)="onIndulgeVice(vice)">
+                <ion-icon name="skull" slot="icon-only"></ion-icon>
+              </ion-button>
+
+              <div class="content-wrapper" (click)="openHabitDetail(vice)">
+                <ion-label>
+                  <h2>{{ vice.title }}</h2>
+                  <p class="stat-text">Risk: {{ getStatLabel(vice.associatedStat) }}</p>
+                </ion-label>
+              </div>
+
+              <div class="stat-badge danger">
+                <ion-icon [name]="getStatIcon(vice.associatedStat)"></ion-icon>
+              </div>
+            </ion-item>
+
+            <ion-item-options side="end">
+              <ion-item-option color="medium" (click)="openHabitDetail(vice)">
+                <ion-icon name="ellipsis-horizontal"></ion-icon>
+              </ion-item-option>
+              <ion-item-option color="danger" (click)="deleteHabit(vice)">
+                <ion-icon name="trash"></ion-icon>
+              </ion-item-option>
+            </ion-item-options>
+          </ion-item-sliding>
+
+          <div *ngIf="vices.length === 0" class="empty-state">
+            <p>Vices not found.</p>
+          </div>
+        </ion-list>
+      </div>
+
+    </div>
   </div>
 </ion-content>

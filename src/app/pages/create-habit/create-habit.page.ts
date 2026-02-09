@@ -36,7 +36,7 @@ import { chevronDownOutline, chevronUpOutline } from 'ionicons/icons';
 })
 export class CreateHabitPage {
 
-  habitType: 'regular' | 'random' = 'regular';
+  habitType: 'good' | 'vice' = 'good';
   habitName: string = '';
 
   // Regular Options
@@ -50,7 +50,7 @@ export class CreateHabitPage {
   selectedStat: any = 'constitution';
   selectedDifficulty: any = 'medium';
 
-  newHabit!: Habit;
+  newHabit: Habit = {} as Habit; // Initialize with empty object
 
   availableIcons = [
     'water', 'barbell', 'book', 'bed', 'bicycle', 'briefcase',
@@ -95,7 +95,7 @@ export class CreateHabitPage {
   async saveHabit() {
     let freqString = '';
 
-    if (this.habitType === 'regular') {
+    if (this.habitType === 'good') {
       freqString = this.frequency;
     } else {
       freqString = `${this.randomCount} times per ${this.randomPeriod}`;

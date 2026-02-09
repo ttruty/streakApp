@@ -8,7 +8,7 @@ export interface Habit {
   id: string;
   title: string;
   icon: string;
-  type: 'regular' | 'random';
+  type: 'good' | 'vice';
   frequency: string; // e.g., "daily", "weekly", "3x/week"
   reward: 'low' | 'medium' | 'high';
   completed: boolean;
@@ -47,7 +47,7 @@ export class HabitService {
           id: 'default_water',
           title: 'Drink Water',
           icon: 'water', // Make sure this matches your registered icons
-          type: 'regular',
+          type: 'good',
           frequency: 'daily',
           reward: 'low',
           completed: false,
@@ -55,7 +55,19 @@ export class HabitService {
           history: [],
           associatedStat: 'constitution',
           difficulty: 'medium'
-
+        },
+        {
+          id: 'default_smoke',
+          title: 'Smoke Cigarettes',
+          icon: 'flame', // Make sure this matches your registered icons
+          type: 'vice',
+          frequency: 'daily',
+          reward: 'medium',
+          completed: false,
+          streak: 0,
+          history: [],
+          associatedStat: 'constitution',
+          difficulty: 'medium'
         }
       ];
 

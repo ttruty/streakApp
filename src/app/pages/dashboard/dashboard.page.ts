@@ -8,7 +8,7 @@ import {
   IonItemSliding, IonItemOptions, IonItemOption, AlertController
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { settingsOutline, flame, flash } from 'ionicons/icons';
+import { settingsOutline, flame, flash, ellipsisHorizontal } from 'ionicons/icons';
 
 // // Three.js Imports
 // import * as THREE from 'three';
@@ -54,7 +54,9 @@ import { BuffModalComponent } from 'src/app/components/buff-modal/buff-modal.com
 })
 export class DashboardPage {
 
-  habits: Habit[] = []; // Change to use Habit interface
+  goodHabits: Habit[] = [];
+  vices: Habit[] = [];
+  completedHabits: Habit[] = [];
   animatingHabits = new Set<string>();
 
   constructor(
@@ -229,9 +231,12 @@ export class DashboardPage {
   refreshData() {
     // 1. Get all habits
     const allHabits = this.habitService.getHabits();
+// Filter logic
+    this.goodHabits = allHabits.filter(h => h.type === 'good' && !h.completed);
+    this.completedHabits = allHabits.filter(h => h.type === 'good' && h.completed);
 
-    // 2. Filter: Only show habits that are NOT completed
-    this.habits = allHabits.filter(h => !h.completed);
+    // Vices are never "completed", they just exist to be fought
+    this.vices = allHabits.filter(h => h.type === 'vice');
   }
 
   async openSettings() {
@@ -243,5 +248,36 @@ export class DashboardPage {
       handle: true
     });
     await modal.present();
+  }
+
+  // ACTION: When user clicks a Vice (+)
+  async onIndulgeVice(vice: Habit) {
+
+    // 1. Play "Damage" Sound
+    // this.soundService.play('damage'); // You'll need to add a damage.mp3!
+
+    // 2. Shake Animation (Visual Feedback)
+    const element = document.getElementById(vice.id);
+    if (element) {
+      element.classList.add('shake');
+      setTimeout(() => element.classList.remove('shake'), 500);
+    }
+
+    // 3. Apply Penalty (True = isPenalty)
+    // This reduces stats instead of increasing them
+    this.charService.modifyStat(vice.associatedStat as any, vice.difficulty, true);
+
+    // 4. Show Toast
+    const toast = await this.toastCtrl.create({
+      message: `Ouch! ${vice.associatedStat.toUpperCase()} damaged.`,
+      duration: 1000,
+      color: 'danger',
+      position: 'top',
+      icon: 'skull'
+    });
+    toast.present();
+
+    // Optional: Reset streak on vices? Or count how many times you did it?
+    // For now, we just punish the stats.
   }
 }

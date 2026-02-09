@@ -4,16 +4,28 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true" class="ion-padding">
+<ion-content [fullscreen]="true" class="ion-padding" [class]="newHabit.type">
 
-  <ion-segment [(ngModel)]="habitType" mode="ios" class="custom-segment">
+  <ion-segment [(ngModel)]="newHabit.type" mode="ios" class="ion-margin-bottom">
+    <ion-segment-button value="good">
+      <ion-label>Good Habit</ion-label>
+    </ion-segment-button>
+    <ion-segment-button value="vice">
+      <ion-label color="danger">Vice</ion-label> </ion-segment-button>
+  </ion-segment>
+
+  <!-- <ion-item>
+    <ion-label position="stacked">Title</ion-label>
+    <ion-input [(ngModel)]="newHabit.title" placeholder="e.g. {{ newHabit.type === 'good' ? 'Read a Book' : 'Ate Junk Food' }}"></ion-input>
+  </ion-item> -->
+  <!-- <ion-segment [(ngModel)]="habitType" mode="ios" class="custom-segment">
     <ion-segment-button value="regular">
       <ion-label>Regular Habit</ion-label>
     </ion-segment-button>
     <ion-segment-button value="random">
       <ion-label>Random Event</ion-label>
     </ion-segment-button>
-  </ion-segment>
+  </ion-segment> -->
 
   <div class="form-container">
     <ion-item class="input-item">
@@ -83,7 +95,7 @@
       </div>
     </div>
 
-    <div *ngIf="habitType === 'regular'" class="frequency-section">
+    <div *ngIf="newHabit.type === 'good'" class="frequency-section">
       <ion-item class="input-item">
         <ion-label position="stacked">Frequency</ion-label>
         <ion-select [(ngModel)]="frequency" interface="popover">
@@ -93,7 +105,7 @@
       </ion-item>
     </div>
 
-    <div *ngIf="habitType === 'random'">
+    <!-- <div *ngIf="habitType === 'random'">
       <div class="info-box">
         <ion-icon name="dice-outline"></ion-icon>
         <p>Random events will pop up unexpectedly based on your settings.</p>
@@ -117,7 +129,7 @@
           <ion-select-option value="week">Per Week</ion-select-option>
         </ion-select>
       </ion-item>
-    </div>
+    </div> -->
 
   </div>
 
